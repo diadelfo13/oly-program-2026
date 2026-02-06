@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Oly Program Calculator (8-week)</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:rgba(255,255,255,.05);
+      --panel2:rgba(255,255,255,.03);
+      --border:rgba(255,255,255,.10);
+      --muted:rgba(255,255,255,.65);
+      --blue:#2563eb;
+      --blue2:#1d4ed8;
+      --text:#eef2ff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .wrap{max-width:1040px;margin:0 auto;padding:16px}
+    h1{font-size:20px;margin:0 0 4px}
+    .sub{font-size:12px;color:var(--muted);margin:0 0 12px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:12px}
+    .grid{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:900px){ .grid{grid-template-columns:1fr 1fr} }
+    label{display:grid;gap:6px;font-size:12px;color:var(--muted)}
+    input,select{background:rgba(0,0,0,.25);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:10px;font-size:14px;outline:none}
+    input::placeholder{color:rgba(255,255,255,.35)}
+    .btn{border:1px solid var(--border);background:rgba(0,0,0,.22);color:var(--text);padding:10px 12px;border-radius:12px;font-weight:700;font-size:12px;cursor:pointer;user-select:none}
+    .btn.primary{background:var(--blue);border-color:transparent}
+    .btn.primary:hover{background:var(--blue2)}
+    .btn.small{padding:8px 10px;font-size:12px}
+    .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.06);font-size:12px;color:var(--muted);white-space:nowrap}
+    .pill.on{color:#fff;background:rgba(37,99,235,.25);border-color:rgba(37,99,235,.5)}
+    .pill.good{color:#d1fae5;background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.35)}
+    .pill.bad{color:#fee2e2;background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.35)}
+    .sectionTitle{font-size:13px;color:var(--muted);margin:6px 0 0}
+    .muted{color:var(--muted);font-size:12px;line-height:1.35}
+    .divider{height:1px;background:var(--border);margin:10px 0}
+    .weeks,.days{display:flex;gap:6px;flex-wrap:wrap}
+    .toggleRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .inputRow{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:900px){ .inputRow{grid-template-columns:1fr 1fr} }
+
+    details.week{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--panel2)}
+    details.week > summary{list-style:none;cursor:pointer;user-select:none;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(255,255,255,.03)}
+    details.week > summary::-webkit-details-marker{display:none}
+    .wkLeft{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .wkRight{display:flex;gap:8px;align-items:center}
+    .dayCard{border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.04);overflow:hidden;margin:10px 12px}
+    .dayHead{padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(0,0,0,.18)}
+    .dayHead .left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .dayHead .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .liftList{padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+    .lift{border:1px solid var(--border);background:rgba(0,0,0,.18);border-radius:14px;padding:10px}
+    .liftTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .liftName{font-weight:800;font-size:14px}
+    .tag{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:11px;padding:4px 8px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--muted);white-space:nowrap}
+    .liftMid{margin-top:6px;color:var(--muted);font-size:13px}
+    .liftWt{margin-top:4px;font-size:18px;font-weight:900}
+    .checkbox{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);user-select:none}
+    .checkbox input{transform:scale(1.15)}
+    .footerRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    .rightActions{display:flex;gap:8px;flex-wrap:wrap}
+    .miniHelp{font-size:11px;color:var(--muted)}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>Oly Program Calculator</h1>
+    <p class="sub">8-week (3×/wk) • TM + readiness + deload • back-off singles • autosave</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="inputRow">
+          <label>Snatch 1RM
+            <input id="snatch" type="number" step="0.5" value="215" />
+          </label>
+
+          <label>Clean 1RM
+            <input id="clean" type="number" step="0.5" value="300" />
+          </label>
+
+          <label>Jerk 1RM
+            <input id="jerk" type="number" step="0.5" value="285" />
+          </label>
+
+          <label>Back Squat 1RM
+            <input id="bs" type="number" step="0.5" value="380" />
+          </label>
+
+          <label>Front Squat 1RM
+            <input id="fs" type="number" step="0.5" value="300" />
+          </label>
+
+          <div class="row">
+            <label style="flex:1;min-width:160px;">Units
+              <select id="unit">
+                <option value="lb" selected>lb</option>
+                <option value="kg">kg</option>
+              </select>
+            </label>
+
+            <label style="flex:1;min-width:160px;">Rounding increment
+              <input id="inc" type="number" step="0.5" value="5" />
+            </label>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <label style="flex:1;min-width:180px;">Training Max (TM%) — apply to all lifts
+              <select id="tmAll">
+                <option value="0.90">90%</option>
+                <option value="0.925" selected>92.5%</option>
+                <option value="0.95">95%</option>
+              </select>
+            </label>
+
+            <label style="flex:1;min-width:180px;">Readiness
+              <select id="feel">
+                <option value="ok" selected>OK</option>
+                <option value="good">Good (+2.5% top work)</option>
+                <option value="bad">Bad (-5% top work)</option>
+              </select>
+            </label>
+
+            <label style="flex:1;min-width:160px;">Deload Mode
+              <select id="deload">
+                <option value="off" selected>OFF</option>
+                <option value="on">ON (−10% intensity, −40% sets)</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="row">
+            <label style="flex:1;min-width:240px;">Filter (optional)
+              <input id="filter" type="text" placeholder="snatch, jerk, week 6, squat…" />
+            </label>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="toggleRow">
+            <button id="todayToggle" class="btn small primary">Today Mode: ON</button>
+            <div class="weeks" id="weekButtons"></div>
+            <div class="days" id="dayButtons"></div>
+          </div>
+
+          <div class="row">
+            <span class="pill on" id="currentPill">Week 1 • Day 1</span>
+            <span class="pill" id="countPill">0 lifts</span>
+            <span class="pill" id="feelPill">Readiness: OK</span>
+            <span class="pill" id="deloadPill">Deload: OFF</span>
+          </div>
+
+          <div class="footerRow">
+            <div class="muted">
+              Autosave: this device + browser (localStorage). Add to Home Screen for “app” feel.
+              <div class="miniHelp">Rules: miss → drop 3–5% and finish; cap 3 misses/lift/day. Back-off singles are baked in.</div>
+            </div>
+            <div class="rightActions">
+              <button id="exportCsv" class="btn">Export CSV</button>
+              <button id="resetProgress" class="btn">Reset progress</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sectionTitle">Program</div>
+        <div id="program"></div>
+
+        <div class="divider"></div>
+        <div class="muted">
+          Cycle intent: Weeks 1–3 accumulate (tech + squat base) • Week 4 deload/primer • Weeks 5–6 strength • Week 7 realization • Week 8 peak/test.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ----------------------------
+  // FIXED Program Template (8 weeks)
+  // sources: snatch | clean | jerk | bs | fs | cj_combo
+  // cj_combo = min(clean%, jerk%) for combo work
+  //
+  // Notes:
+  // - Back-off singles are explicit rows on classic single days.
+  // - Week 4 is a deload/primer (no tests).
+  // - Week 8 Day 3 is the only test.
+  // ----------------------------
+
+  const PROGRAM_8W = [
+    // WEEK 1 (accumulate - doubles, squat volume, speed pulls)
+    { week: 1, day: 1, items: [
+      { lift: "Snatch", sets: 6, reps: 2, pct: 0.70, source: "snatch" },
+      { lift: "Snatch Pull (speed)", sets: 4, reps: 3, pct: 0.95, source: "snatch" },
+      { lift: "Back Squat (volume)", sets: 5, reps: 5, pct: 0.70, source: "bs" },
+    ]},
+    { week: 1, day: 2, items: [
+      { lift: "Jerk (rack/blocks)", sets: 6, reps: 2, pct: 0.72, source: "jerk" },
+      { lift: "Hang Clean (mid-thigh)", sets: 5, reps: 2, pct: 0.70, source: "clean" },
+      { lift: "Push Press", sets: 3, reps: 5, pct: 0.62, source: "jerk" },
+    ]},
+    { week: 1, day: 3, items: [
+      { lift: "Clean + Jerk (1+1)", sets: 5, reps: 1, pct: 0.70, source: "cj_combo" },
+      { lift: "Front Squat (heavy-ish)", sets: 4, reps: 3, pct: 0.75, source: "fs" },
+      { lift: "Clean Pull (speed)", sets: 4, reps: 3, pct: 0.95, source: "clean" },
+      { lift: "Snatch Balance / OHS", sets: 4, reps: 2, pct: 0.60, source: "snatch" },
+    ]},
+
+    // WEEK 2 (accumulate - slightly heavier, strength pulls)
+    { week: 2, day: 1, items: [
+      { lift: "Snatch", sets: 6, reps: 2, pct: 0.75, source: "snatch" },
+      { lift: "Snatch Pull (strength)", sets: 4, reps: 2, pct: 1.05, source: "snatch" },
+      { lift: "Back Squat (volume)", sets: 5, reps: 4, pct: 0.75, source: "bs" },
+    ]},
+    { week: 2, day: 2, items: [
+      { lift: "Jerk (rack/blocks)", sets: 6, reps: 2, pct: 0.76, source: "jerk" },
+      { lift: "Paused Clean (knee)", sets: 5, reps: 2, pct: 0.73, source: "clean" },
+      { lift: "Push Press", sets: 3, reps: 5, pct: 0.65, source: "jerk" },
+    ]},
+    { week: 2, day: 3, items: [
+      { lift: "Clean + Jerk (1+1)", sets: 6, reps: 1, pct: 0.75, source: "cj_combo" },
+      { lift: "Front Squat (heavy-ish)", sets: 5, reps: 3, pct: 0.78, source: "fs" },
+      { lift: "Clean Pull (strength)", sets: 4, reps: 2, pct: 1.10, source: "clean" },
+      { lift: "Snatch Balance / OHS", sets: 4, reps: 2, pct: 0.62, source: "snatch" },
+    ]},
+
+    // WEEK 3 (accumulate → transition to singles + back-offs; speed pulls)
+    { week: 3, day: 1, items: [
+      { lift: "Snatch (top singles)", sets: 5, reps: 1, pct: 0.80, source: "snatch", tag: "TOP" },
+      { lift: "Snatch (back-off singles)", sets: 4, reps: 1, pct: 0.74, source: "snatch", tag: "BACKOFF" },
+      { lift: "Snatch Pull (speed)", sets: 4, reps: 3, pct: 1.00, source: "snatch" },
+      { lift: "Back Squat (volume)", sets: 5, reps: 3, pct: 0.80, source: "bs" },
+    ]},
+    { week: 3, day: 2, items: [
+      { lift: "Jerk (top singles)", sets: 5, reps: 1, pct: 0.80, source: "jerk", tag: "TOP" },
+      { lift: "Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.74, source: "jerk", tag: "BACKOFF" },
+      { lift: "Clean (top singles)", sets: 5, reps: 1, pct: 0.78, source: "clean", tag: "TOP" },
+      { lift: "Clean (back-off singles)", sets: 3, reps: 1, pct: 0.72, source: "clean", tag: "BACKOFF" },
+    ]},
+    { week: 3, day: 3, items: [
+      { lift: "Clean + Jerk (top singles)", sets: 5, reps: 1, pct: 0.80, source: "cj_combo", tag: "TOP" },
+      { lift: "Clean + Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.74, source: "cj_combo", tag: "BACKOFF" },
+      { lift: "Front Squat (heavier)", sets: 5, reps: 2, pct: 0.82, source: "fs" },
+      { lift: "Clean Pull (speed)", sets: 4, reps: 3, pct: 1.00, source: "clean" },
+      { lift: "OHS (tech)", sets: 3, reps: 3, pct: 0.55, source: "snatch" },
+    ]},
+
+    // WEEK 4 (DELOAD / PRIMER - no tests; reduce volume)
+    { week: 4, day: 1, items: [
+      { lift: "Snatch (fast singles)", sets: 5, reps: 1, pct: 0.78, source: "snatch" },
+      { lift: "Back Squat (light)", sets: 3, reps: 3, pct: 0.70, source: "bs" },
+    ]},
+    { week: 4, day: 2, items: [
+      { lift: "Jerk (fast singles)", sets: 4, reps: 1, pct: 0.78, source: "jerk" },
+      { lift: "Clean (fast singles)", sets: 4, reps: 1, pct: 0.76, source: "clean" },
+    ]},
+    { week: 4, day: 3, items: [
+      { lift: "Clean + Jerk (fast singles)", sets: 4, reps: 1, pct: 0.78, source: "cj_combo" },
+      { lift: "Front Squat (light)", sets: 3, reps: 2, pct: 0.70, source: "fs" },
+    ]},
+
+    // WEEK 5 (STRENGTH - heavier singles + back-offs; strength pulls; heavier squats)
+    { week: 5, day: 1, items: [
+      { lift: "Snatch (top singles)", sets: 5, reps: 1, pct: 0.84, source: "snatch", tag: "TOP" },
+      { lift: "Snatch (back-off singles)", sets: 4, reps: 1, pct: 0.78, source: "snatch", tag: "BACKOFF" },
+      { lift: "Back Squat (heavy)", sets: 5, reps: 3, pct: 0.82, source: "bs" },
+      { lift: "Snatch Pull (strength)", sets: 4, reps: 2, pct: 1.10, source: "snatch" },
+    ]},
+    { week: 5, day: 2, items: [
+      { lift: "Jerk (top singles)", sets: 5, reps: 1, pct: 0.84, source: "jerk", tag: "TOP" },
+      { lift: "Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.78, source: "jerk", tag: "BACKOFF" },
+      { lift: "Clean (top singles)", sets: 5, reps: 1, pct: 0.82, source: "clean", tag: "TOP" },
+      { lift: "Clean (back-off singles)", sets: 3, reps: 1, pct: 0.76, source: "clean", tag: "BACKOFF" },
+    ]},
+    { week: 5, day: 3, items: [
+      { lift: "Clean + Jerk (top singles)", sets: 5, reps: 1, pct: 0.84, source: "cj_combo", tag: "TOP" },
+      { lift: "Clean + Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.78, source: "cj_combo", tag: "BACKOFF" },
+      { lift: "Front Squat (heavy)", sets: 4, reps: 2, pct: 0.85, source: "fs" },
+      { lift: "Clean Pull (strength)", sets: 4, reps: 2, pct: 1.12, source: "clean" },
+      { lift: "Snatch Balance", sets: 3, reps: 2, pct: 0.60, source: "snatch" },
+    ]},
+
+    // WEEK 6 (STRENGTH - slightly heavier, lower reps)
+    { week: 6, day: 1, items: [
+      { lift: "Snatch (top singles)", sets: 4, reps: 1, pct: 0.87, source: "snatch", tag: "TOP" },
+      { lift: "Snatch (back-off singles)", sets: 4, reps: 1, pct: 0.80, source: "snatch", tag: "BACKOFF" },
+      { lift: "Back Squat (heavy)", sets: 5, reps: 2, pct: 0.86, source: "bs" },
+      { lift: "Snatch Pull (strength)", sets: 4, reps: 2, pct: 1.12, source: "snatch" },
+    ]},
+    { week: 6, day: 2, items: [
+      { lift: "Jerk (top singles)", sets: 4, reps: 1, pct: 0.87, source: "jerk", tag: "TOP" },
+      { lift: "Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.80, source: "jerk", tag: "BACKOFF" },
+      { lift: "Clean (top singles)", sets: 4, reps: 1, pct: 0.85, source: "clean", tag: "TOP" },
+      { lift: "Clean (back-off singles)", sets: 3, reps: 1, pct: 0.78, source: "clean", tag: "BACKOFF" },
+    ]},
+    { week: 6, day: 3, items: [
+      { lift: "Clean + Jerk (top singles)", sets: 4, reps: 1, pct: 0.87, source: "cj_combo", tag: "TOP" },
+      { lift: "Clean + Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.80, source: "cj_combo", tag: "BACKOFF" },
+      { lift: "Front Squat (heavy)", sets: 3, reps: 1, pct: 0.88, source: "fs" },
+      { lift: "Clean Pull (strength)", sets: 4, reps: 2, pct: 1.15, source: "clean" },
+    ]},
+
+    // WEEK 7 (REALIZATION - low volume, heavy clean singles, no grind)
+    { week: 7, day: 1, items: [
+      { lift: "Snatch (heavy clean singles)", sets: 4, reps: 1, pct: 0.90, source: "snatch", tag: "TOP" },
+      { lift: "Snatch (back-off singles)", sets: 3, reps: 1, pct: 0.84, source: "snatch", tag: "BACKOFF" },
+      { lift: "Back Squat (single exposure)", sets: 3, reps: 1, pct: 0.90, source: "bs" },
+    ]},
+    { week: 7, day: 2, items: [
+      { lift: "Clean + Jerk (heavy clean singles)", sets: 4, reps: 1, pct: 0.90, source: "cj_combo", tag: "TOP" },
+      { lift: "Clean + Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.84, source: "cj_combo", tag: "BACKOFF" },
+    ]},
+    { week: 7, day: 3, items: [
+      { lift: "Jerk (heavy clean singles)", sets: 4, reps: 1, pct: 0.90, source: "jerk", tag: "TOP" },
+      { lift: "Jerk (back-off singles)", sets: 2, reps: 1, pct: 0.84, source: "jerk", tag: "BACKOFF" },
+      { lift: "Front Squat (single exposure)", sets: 3, reps: 1, pct: 0.90, source: "fs" },
+    ]},
+
+    // WEEK 8 (PEAK/TEST)
+    { week: 8, day: 1, items: [
+      { lift: "Snatch (opener practice)", sets: 3, reps: 1, pct: 0.88, source: "snatch" },
+      { lift: "Clean + Jerk (opener practice)", sets: 3, reps: 1, pct: 0.88, source: "cj_combo" },
+    ]},
+    { week: 8, day: 2, items: [
+      { lift: "Snatch (very light)", sets: 3, reps: 1, pct: 0.70, source: "snatch" },
+      { lift: "Jerk (very light)", sets: 3, reps: 1, pct: 0.70, source: "jerk" },
+    ]},
+    { week: 8, day: 3, items: [
+      { lift: "TEST: Snatch (attempts)", sets: 3, reps: 1, pct: 1.00, source: "snatch", tag: "TEST" },
+      { lift: "TEST: Clean + Jerk (attempts)", sets: 3, reps: 1, pct: 1.00, source: "cj_combo", tag: "TEST" },
+    ]},
+  ];
+
+  // ----------------------------
+  // State + Autosave
+  // ----------------------------
+  const STORAGE_KEY = "oly_prog_state_v2_fixed";
+  const defaultState = {
+    currentWeek: 1,
+    currentDay: 1,
+    todayMode: true,
+    expandedWeeks: [1],
+    completed: {}, // "W1-D2": true
+  };
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return {...defaultState};
+      const s = JSON.parse(raw);
+      return {
+        ...defaultState,
+        ...s,
+        expandedWeeks: Array.isArray(s.expandedWeeks) ? s.expandedWeeks : defaultState.expandedWeeks,
+        completed: (s.completed && typeof s.completed === "object") ? s.completed : {},
+      };
+    }catch(e){
+      return {...defaultState};
+    }
+  }
+  function saveState(s){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }catch(e){} }
+
+  // ----------------------------
+  // Helpers
+  // ----------------------------
+  function roundToIncrement(x, inc){ return Math.round(x / inc) * inc; }
+  function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+
+  function getInputs(){
+    return {
+      snatch: num(document.getElementById("snatch").value),
+      clean:  num(document.getElementById("clean").value),
+      jerk:   num(document.getElementById("jerk").value),
+      bs:     num(document.getElementById("bs").value),
+      fs:     num(document.getElementById("fs").value),
+      unit: document.getElementById("unit").value,
+      inc: num(document.getElementById("inc").value),
+      filter: (document.getElementById("filter").value || "").trim().toLowerCase(),
+      tmAll: Number(document.getElementById("tmAll").value),
+      feel: document.getElementById("feel").value,
+      deload: document.getElementById("deload").value,
+    };
+  }
+
+  function applyReadinessPctAdj(item, inputs){
+    // Only adjust "top work" (tag TOP) and classic/near-classic singles by a small amount.
+    // For simplicity: adjust if tag TOP or lift includes "opener" or "heavy clean singles".
+    const isTop = (item.tag === "TOP") || /opener|heavy clean singles/i.test(item.lift);
+    if(!isTop) return 0;
+    if(inputs.feel === "good") return 0.025;
+    if(inputs.feel === "bad")  return -0.05;
+    return 0;
+  }
+
+  function computeRows(inputs){
+    const tm = inputs.tmAll || 0.925;
+    const one = {
+      snatch: inputs.snatch * tm,
+      clean:  inputs.clean  * tm,
+      jerk:   inputs.jerk   * tm,
+      bs:     inputs.bs     * tm,
+      fs:     inputs.fs     * tm,
+    };
+
+    const out = [];
+    for(const d of PROGRAM_8W){
+      for(const it of d.items){
+        let pct = it.pct;
+
+        // Readiness adjustment for top work
+        pct += applyReadinessPctAdj(it, inputs);
+
+        // Deload mode: reduce intensity and sets
+        let sets = it.sets;
+        if(inputs.deload === "on"){
+          pct *= 0.90; // -10% intensity
+          sets = Math.max(1, Math.round(sets * 0.6)); // -40% sets
+        }
+
+        let raw = 0;
+        if(it.source === "cj_combo"){
+          const rawClean = (one.clean || 0) * pct;
+          const rawJerk  = (one.jerk  || 0) * pct;
+          raw = Math.min(rawClean, rawJerk);
+        } else {
+          const base = one[it.source] || 0;
+          raw = base * pct;
+        }
+
+        const inc = inputs.inc || (inputs.unit === "lb" ? 5 : 2.5);
+        const w = roundToIncrement(raw, inc);
+
+        const limiter = (it.source === "cj_combo")
+          ? (((one.clean*pct) <= (one.jerk*pct)) ? "clean" : "jerk")
+          : "";
+
+        out.push({
+          week: d.week,
+          day: d.day,
+          lift: it.lift,
+          sets,
+          reps: it.reps,
+          pct: Math.round(pct * 100),
+          source: it.source,
+          limiter,
+          weight: w,
+          unit: inputs.unit,
+          tag: it.tag || "",
+          note: (inputs.deload === "on" ? "DELOAD " : "") + (inputs.feel ? `FEEL:${inputs.feel}` : ""),
+        });
+      }
+    }
+    return out;
+  }
+
+  function groupByWeekDay(rows){
+    const weeks = new Map();
+    for(const r of rows){
+      if(!weeks.has(r.week)) weeks.set(r.week, new Map());
+      const days = weeks.get(r.week);
+      if(!days.has(r.day)) days.set(r.day, []);
+      days.get(r.day).push(r);
+    }
+    return Array.from(weeks.entries()).map(([week, daysMap]) => ({
+      week,
+      days: Array.from(daysMap.entries()).map(([day, items]) => ({ day, items }))
+        .sort((a,b)=>a.day-b.day)
+    })).sort((a,b)=>a.week-b.week);
+  }
+
+  function toCSV(rows){
+    const headers = ["week","day","lift","sets","reps","pct","source","limiter","tag","weight","unit","note"];
+    const lines = [headers.join(",")];
+    for(const r of rows){
+      lines.push([
+        r.week,
+        r.day,
+        JSON.stringify(r.lift),
+        r.sets,
+        r.reps,
+        r.pct,
+        r.source,
+        JSON.stringify(r.limiter || ""),
+        JSON.stringify(r.tag || ""),
+        r.weight,
+        r.unit,
+        JSON.stringify(r.note || "")
+      ].join(","));
+    }
+    return lines.join("\n");
+  }
+
+  function download(filename, text){
+    const blob = new Blob([text], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // ----------------------------
+  // UI Rendering
+  // ----------------------------
+  let state = loadState();
+
+  function renderControls(){
+    // Week buttons
+    const wb = document.getElementById("weekButtons");
+    wb.innerHTML = "";
+    for(let w=1; w<=8; w++){
+      const b = document.createElement("button");
+      b.className = "btn small " + (state.currentWeek===w ? "primary" : "");
+      b.textContent = "W" + w;
+      b.onclick = () => {
+        state.currentWeek = w;
+        state.todayMode = true;
+        if(!state.expandedWeeks.includes(w)) state.expandedWeeks.push(w);
+        saveState(state);
+        renderAll();
+      };
+      wb.appendChild(b);
+    }
+
+    // Day buttons
+    const db = document.getElementById("dayButtons");
+    db.innerHTML = "";
+    [1,2,3].forEach(d=>{
+      const b = document.createElement("button");
+      const active = state.todayMode && state.currentDay===d;
+      b.className = "btn small " + (active ? "primary" : "");
+      b.textContent = "D" + d;
+      b.onclick = () => {
+        state.currentDay = d;
+        state.todayMode = true;
+        saveState(state);
+        renderAll();
+      };
+      db.appendChild(b);
+    });
+
+    // Today toggle
+    const t = document.getElementById("todayToggle");
+    t.textContent = "Today Mode: " + (state.todayMode ? "ON" : "OFF");
+    t.className = "btn small " + (state.todayMode ? "primary" : "");
+    t.onclick = () => {
+      state.todayMode = !state.todayMode;
+      saveState(state);
+      renderAll();
+    };
+
+    document.getElementById("currentPill").textContent = `Week ${state.currentWeek} • Day ${state.currentDay}`;
+
+    const inputs = getInputs();
+    const feelPill = document.getElementById("feelPill");
+    feelPill.textContent = `Readiness: ${inputs.feel.toUpperCase()}`;
+    feelPill.className = "pill " + (inputs.feel==="good" ? "good" : inputs.feel==="bad" ? "bad" : "");
+
+    const deloadPill = document.getElementById("deloadPill");
+    deloadPill.textContent = `Deload: ${inputs.deload.toUpperCase()}`;
+    deloadPill.className = "pill " + (inputs.deload==="on" ? "on" : "");
+  }
+
+  function renderProgram(){
+    const inputs = getInputs();
+    const rows = computeRows(inputs);
+
+    // Filter
+    const filtered = inputs.filter
+      ? rows.filter(r => (`week ${r.week} day ${r.day} ${r.lift} ${r.tag} ${r.sets}x${r.reps}`).toLowerCase().includes(inputs.filter))
+      : rows;
+
+    // Count pill for current day (if today mode) or total filtered
+    const count = state.todayMode
+      ? filtered.filter(r => r.week===state.currentWeek && r.day===state.currentDay).length
+      : filtered.length;
+    document.getElementById("countPill").textContent = `${count} lifts`;
+
+    const grouped = groupByWeekDay(filtered);
+    const root = document.getElementById("program");
+    root.innerHTML = "";
+
+    for(const w of grouped){
+      const det = document.createElement("details");
+      det.className = "week";
+      det.open = state.expandedWeeks.includes(w.week);
+
+      const sum = document.createElement("summary");
+      const left = document.createElement("div");
+      left.className = "wkLeft";
+      const title = document.createElement("div");
+      title.style.fontWeight = "900";
+      title.textContent = `Week ${w.week}`;
+      const sub = document.createElement("span");
+      sub.className = "tag";
+      sub.textContent = (w.week<=3) ? "ACCUMULATE" : (w.week===4) ? "DELOAD" : (w.week<=6) ? "STRENGTH" : (w.week===7) ? "REALIZE" : "PEAK/TEST";
+      left.appendChild(title);
+      left.appendChild(sub);
+
+      const right = document.createElement("div");
+      right.className = "wkRight";
+      const wkKey = `W${w.week}`;
+      const wkDone = Object.keys(state.completed).filter(k=>k.startsWith(wkKey)).length;
+      const wkTotal = 3;
+      const badge = document.createElement("span");
+      badge.className = "tag";
+      badge.textContent = `Done ${wkDone}/${wkTotal}`;
+      right.appendChild(badge);
+
+      sum.appendChild(left);
+      sum.appendChild(right);
+
+      sum.onclick = (e) => {
+        // allow toggle but keep state in sync
+        setTimeout(()=>{
+          const isOpen = det.open;
+          const idx = state.expandedWeeks.indexOf(w.week);
+          if(isOpen && idx===-1) state.expandedWeeks.push(w.week);
+          if(!isOpen && idx!==-1) state.expandedWeeks.splice(idx,1);
+          saveState(state);
+        },0);
+      };
+
+      det.appendChild(sum);
+
+      // Days
+      for(const d of w.days){
+        // If Today Mode ON, only show current selection
+        if(state.todayMode && !(w.week===state.currentWeek && d.day===state.currentDay)) continue;
+
+        const dayCard = document.createElement("div");
+        dayCard.className = "dayCard";
+
+        const head = document.createElement("div");
+        head.className = "dayHead";
+
+        const hLeft = document.createElement("div");
+        hLeft.className = "left";
+        const hTitle = document.createElement("div");
+        hTitle.style.fontWeight = "900";
+        hTitle.textContent = `Day ${d.day}`;
+        hLeft.appendChild(hTitle);
+
+        const hRight = document.createElement("div");
+        hRight.className = "right";
+        const key = `W${w.week}-D${d.day}`;
+
+        const cbWrap = document.createElement("label");
+        cbWrap.className = "checkbox";
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = !!state.completed[key];
+        cb.onchange = () => {
+          if(cb.checked) state.completed[key]=true;
+          else delete state.completed[key];
+          saveState(state);
+          renderAll();
+        };
+        const cbText = document.createElement("span");
+        cbText.textContent = "Done";
+        cbWrap.appendChild(cb);
+        cbWrap.appendChild(cbText);
+
+        hRight.appendChild(cbWrap);
+
+        head.appendChild(hLeft);
+        head.appendChild(hRight);
+
+        const list = document.createElement("div");
+        list.className = "liftList";
+
+        for(const it of d.items){
+          const box = document.createElement("div");
+          box.className = "lift";
+
+          const top = document.createElement("div");
+          top.className = "liftTop";
+
+          const nm = document.createElement("div");
+          nm.className = "liftName";
+          nm.textContent = it.lift;
+
+          const tg = document.createElement("span");
+          tg.className = "tag";
+          const src = it.source + (it.limiter ? `/${it.limiter}` : "");
+          const tag = it.tag ? ` • ${it.tag}` : "";
+          tg.textContent = `${src} • ${it.pct}%${tag}`;
+
+          top.appendChild(nm);
+          top.appendChild(tg);
+
+          const mid = document.createElement("div");
+          mid.className = "liftMid";
+          mid.textContent = `${it.sets} × ${it.reps}`;
+
+          const wt = document.createElement("div");
+          wt.className = "liftWt";
+          wt.textContent = `${it.weight} ${it.unit}`;
+
+          box.appendChild(top);
+          box.appendChild(mid);
+          box.appendChild(wt);
+          list.appendChild(box);
+        }
+
+        dayCard.appendChild(head);
+        dayCard.appendChild(list);
+        det.appendChild(dayCard);
+      }
+
+      root.appendChild(det);
+    }
+  }
+
+  function renderAll(){
+    renderControls();
+    renderProgram();
+  }
+
+  // ----------------------------
+  // Wire inputs
+  // ----------------------------
+  function wire(id){
+    const el = document.getElementById(id);
+    el.addEventListener("input", () => renderAll());
+    el.addEventListener("change", () => renderAll());
+  }
+
+  ["snatch","clean","jerk","bs","fs","unit","inc","filter","tmAll","feel","deload"].forEach(wire);
+
+  document.getElementById("exportCsv").onclick = () => {
+    const inputs = getInputs();
+    const rows = computeRows(inputs);
+    download("oly_program.csv", toCSV(rows));
+  };
+
+  document.getElementById("resetProgress").onclick = () => {
+    if(!confirm("Reset week/day tracking and completed checkmarks?")) return;
+    state = {...defaultState};
+    saveState(state);
+    renderAll();
+  };
+
+  // init
+  renderAll();
+</script>
+</body>
+</html>
