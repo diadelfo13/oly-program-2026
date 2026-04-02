@@ -1,757 +1,1871 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#0b1220" />
-  <title>Oly Program Calculator (8-week)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Oly Program Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --bg:#0b1220;
-      --panel:rgba(255,255,255,.05);
-      --panel2:rgba(255,255,255,.03);
-      --border:rgba(255,255,255,.10);
-      --muted:rgba(255,255,255,.65);
-      --blue:#2563eb;
-      --blue2:#1d4ed8;
-      --text:#eef2ff;
+    /* ── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #110f0d;
+      --surface:   #1c1915;
+      --surface2:  #262320;
+      --surface3:  #302c27;
+      --border:    #3d372f;
+      --border-l:  #50483d;
+      --amber:     #e04040;
+      --amber-dim: #4a1a1a;
+      --amber-glow: rgba(224, 64, 64, 0.12);
+      --cyan:      #6bc5cb;
+      --cyan-dim:  #1a3f42;
+      --green:     #6dce6d;
+      --green-dim: #1a3a1a;
+      --red:       #d95050;
+      --red-dim:   #3d1818;
+      --purple:    #b28cd9;
+      --purple-dim:#2d1a3a;
+      --text:      #e8e0d4;
+      --text-sec:  #c5baa8;
+      --muted:     #8a7e6f;
+      --radius:    12px;
+      --radius-sm: 8px;
+      --font-display: 'Outfit', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+      --gold:      var(--amber);
+      --gold-dim:  var(--amber-dim);
+      --blue:      var(--cyan);
+      --blue-dim:  var(--cyan-dim);
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    .wrap{max-width:1040px;margin:0 auto;padding:16px}
-    h1{font-size:20px;margin:0 0 4px}
-    .sub{font-size:12px;color:var(--muted);margin:0 0 12px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:12px}
-    .grid{display:grid;grid-template-columns:1fr;gap:10px}
-    @media(min-width:900px){ .grid{grid-template-columns:1fr 1fr} }
-    label{display:grid;gap:6px;font-size:12px;color:var(--muted)}
-    input,select{background:rgba(0,0,0,.25);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:10px;font-size:14px;outline:none}
-    input::placeholder{color:rgba(255,255,255,.35)}
-    .btn{border:1px solid var(--border);background:rgba(0,0,0,.22);color:var(--text);padding:10px 12px;border-radius:12px;font-weight:700;font-size:12px;cursor:pointer;user-select:none}
-    .btn.primary{background:var(--blue);border-color:transparent}
-    .btn.primary:hover{background:var(--blue2)}
-    .btn.small{padding:8px 10px;font-size:12px}
-    .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.06);font-size:12px;color:var(--muted);white-space:nowrap}
-    .pill.on{color:#fff;background:rgba(37,99,235,.25);border-color:rgba(37,99,235,.5)}
-    .pill.good{color:#d1fae5;background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.35)}
-    .pill.bad{color:#fee2e2;background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.35)}
-    .sectionTitle{font-size:13px;color:var(--muted);margin:6px 0 0}
-    .muted{color:var(--muted);font-size:12px;line-height:1.35}
-    .divider{height:1px;background:var(--border);margin:10px 0}
-    .weeks,.days{display:flex;gap:6px;flex-wrap:wrap}
-    .toggleRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .inputRow{display:grid;grid-template-columns:1fr;gap:10px}
-    @media(min-width:900px){ .inputRow{grid-template-columns:1fr 1fr} }
 
-    details.week{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--panel2)}
-    details.week > summary{list-style:none;cursor:pointer;user-select:none;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(255,255,255,.03)}
-    details.week > summary::-webkit-details-marker{display:none}
-    .wkLeft{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .wkRight{display:flex;gap:8px;align-items:center}
-    .dayCard{border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.04);overflow:hidden;margin:10px 12px}
-    .dayHead{padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(0,0,0,.18)}
-    .dayHead .left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .dayHead .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .liftList{padding:10px 12px;display:flex;flex-direction:column;gap:10px}
-    .lift{border:1px solid var(--border);background:rgba(0,0,0,.18);border-radius:14px;padding:10px}
-    .liftTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .liftName{font-weight:800;font-size:14px}
-    .tag{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:11px;padding:4px 8px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--muted);white-space:nowrap}
-    .liftMid{margin-top:6px;color:var(--muted);font-size:13px}
-    .liftWt{margin-top:4px;font-size:18px;font-weight:900}
-    .checkbox{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);user-select:none}
-    .checkbox input{transform:scale(1.15)}
-    .footerRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-    .rightActions{display:flex;gap:8px;flex-wrap:wrap}
-    .miniHelp{font-size:11px;color:var(--muted)}
+    html {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      position: relative;
+    }
+
+    /* ── Grain Overlay ───────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px;
+    }
+
+    /* ── Layout ───────────────────────────────────────────────── */
+    .app {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 24px 16px 100px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      padding: 32px 0 24px;
+      position: relative;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    }
+    .header h1 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -1px;
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+    .header h1 span {
+      color: var(--amber);
+    }
+    .header p {
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-top: 10px;
+      letter-spacing: 0.3px;
+      line-height: 1.5;
+    }
+
+    /* ── Card ─────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin-bottom: 20px;
+      position: relative;
+      box-shadow:
+        0 1px 3px rgba(0,0,0,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--amber);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    /* ── Form Controls ────────────────────────────────────────── */
+    .row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 600;
+      flex: 1;
+      min-width: 130px;
+      letter-spacing: 0.3px;
+    }
+    input[type=number], input[type=text], select, textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      width: 100%;
+      outline: none;
+      transition: all .2s ease;
+      font-family: var(--font-body);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+    }
+    input[type=number]:focus, input[type=text]:focus, select:focus, textarea:focus {
+      border-color: var(--amber);
+      box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.15),
+        0 0 0 2px var(--amber-glow);
+    }
+    input[type=number]::placeholder, input[type=text]::placeholder {
+      color: var(--muted);
+      opacity: 0.5;
+    }
+    select option { background: var(--surface2); }
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 18px 0;
+    }
+
+    /* ── Buttons ──────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text-sec);
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all .2s ease;
+      letter-spacing: 0.2px;
+    }
+    .btn:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: var(--surface3);
+      transform: translateY(-1px);
+    }
+    .btn:active { transform: translateY(0); }
+    .btn.primary {
+      background: var(--amber);
+      border-color: var(--amber);
+      color: var(--bg);
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(232,168,73,0.2);
+    }
+    .btn.primary:hover {
+      background: #d4952f;
+      box-shadow: 0 4px 12px rgba(232,168,73,0.3);
+    }
+    .btn.gold { background: var(--amber); border-color: var(--amber); color: var(--bg); font-weight: 700; }
+    .btn.gold:hover { background: #d4952f; }
+    .btn.sm { padding: 5px 10px; font-size: 0.73rem; }
+    .btn.danger { border-color: var(--red); color: var(--red); }
+    .btn.danger:hover { background: var(--red-dim); border-color: var(--red); color: #fca5a5; }
+    .btn.miss {
+      border-color: var(--amber);
+      color: var(--amber);
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .btn.miss:hover { background: var(--amber-dim); }
+    .btn.miss.maxed {
+      border-color: var(--muted);
+      color: var(--muted);
+      cursor: not-allowed;
+      opacity: .35;
+      pointer-events: none;
+    }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+    /* ── Pills / Tags ─────────────────────────────────────────── */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      font-family: var(--font-display);
+      letter-spacing: 0.3px;
+    }
+    .pill.on    { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); }
+    .pill.good  { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+    .pill.bad   { background: var(--red-dim); border-color: var(--red); color: #fca5a5; }
+    .pill.gold  { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: .6px;
+      font-family: var(--font-display);
+      text-transform: uppercase;
+    }
+    .tag.phase-acc  { background: var(--cyan-dim); color: var(--cyan); }
+    .tag.phase-del  { background: var(--amber-dim); color: var(--amber); }
+    .tag.phase-str  { background: var(--green-dim); color: var(--green); }
+    .tag.phase-rea  { background: var(--purple-dim); color: var(--purple); }
+    .tag.phase-pek  { background: var(--red-dim); color: #fca5a5; }
+    .tag.TOP     { background: var(--cyan-dim); color: var(--cyan); }
+    .tag.BACKOFF { background: var(--surface3); color: var(--muted); }
+    .tag.TEST    { background: var(--red-dim); color: #fca5a5; }
+    .tag.src     { background: var(--surface2); color: var(--muted); font-size: 0.62rem; }
+    .tag.limited { background: var(--amber-dim); color: var(--amber); font-size: 0.62rem; }
+
+    /* ── Status row ───────────────────────────────────────────── */
+    .status-row { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin: 12px 0; }
+
+    /* ── Week nav ─────────────────────────────────────────────── */
+    .week-nav { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+    .week-nav .label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-right: 4px;
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ── Per-lift TM ──────────────────────────────────────────── */
+    details.per-lift-tm { margin-top: 6px; }
+    details.per-lift-tm > summary {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      user-select: none;
+      transition: color .2s;
+    }
+    details.per-lift-tm > summary::-webkit-details-marker { display: none; }
+    details.per-lift-tm > summary:hover { color: var(--text-sec); }
+    details.per-lift-tm .per-lift-body { padding-top: 10px; }
+
+    /* ── Program ──────────────────────────────────────────────── */
+    details.week {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: box-shadow .2s;
+    }
+    details.week[open] {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+    details.week summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 18px;
+      cursor: pointer;
+      list-style: none;
+      background: linear-gradient(180deg, var(--surface2), var(--surface));
+      user-select: none;
+      transition: background .15s;
+      border-bottom: 1px solid transparent;
+    }
+    details.week[open] summary {
+      border-bottom-color: var(--border);
+    }
+    details.week summary::-webkit-details-marker { display: none; }
+    details.week summary:hover { background: var(--surface3); }
+    .wk-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.05rem;
+      letter-spacing: -0.3px;
+    }
+    .wk-right { display: flex; align-items: center; gap: 8px; }
+    .wk-done  { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+
+    .day-card {
+      border-top: 1px solid var(--border);
+      padding: 18px 18px;
+      background: var(--surface);
+    }
+    .day-card:first-of-type { border-top: none; }
+    .day-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .day-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .day-done-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 600;
+      transition: color .15s;
+    }
+    .day-done-label:hover { color: var(--text-sec); }
+    .day-done-label input[type=checkbox] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--green);
+      cursor: pointer;
+    }
+    .day-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .tonnage-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font-display);
+      letter-spacing: 0.3px;
+    }
+
+    .lift-list { display: flex; flex-direction: column; gap: 10px; }
+    .lift-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      transition: all .2s ease;
+      position: relative;
+    }
+    .lift-box::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--border);
+      border-radius: 3px 0 0 3px;
+      transition: background .2s;
+    }
+    .lift-box:hover::before { background: var(--amber); }
+    .lift-box.done-day { opacity: .4; }
+    .lift-box.has-misses { border-color: var(--amber); }
+    .lift-box.has-misses::before { background: var(--amber); }
+
+    .lift-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+    .lift-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.92rem;
+      letter-spacing: -0.2px;
+    }
+    .lift-tags { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+    .lift-mid { font-size: 0.78rem; color: var(--muted); margin-bottom: 3px; font-weight: 500; }
+    .lift-wt {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--amber);
+      letter-spacing: -0.5px;
+      text-shadow: 0 0 24px var(--amber-glow);
+    }
+    .lift-wt span.unit {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-left: 3px;
+      text-shadow: none;
+    }
+    .lift-wt span.orig {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-left: 8px;
+      text-decoration: line-through;
+      text-shadow: none;
+    }
+    .miss-info {
+      font-size: 0.72rem;
+      color: var(--amber);
+      font-weight: 700;
+      margin: 4px 0 6px;
+      font-family: var(--font-display);
+    }
+    .lift-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Plate Calculator ─────────────────────────────────────── */
+    .plate-section {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .plate-section h4 {
+      font-family: var(--font-display);
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .plate-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .plate-chip {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      border: 2px solid;
+      font-family: var(--font-display);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 2px 6px rgba(0,0,0,0.3);
+      transition: transform .15s;
+    }
+    .plate-chip:hover { transform: scale(1.05); }
+    .plate-chip .p-weight { font-size: 0.88rem; }
+    .plate-chip .p-count  { font-size: 0.62rem; opacity: .75; }
+    .p-red    { background: linear-gradient(135deg, #3d1818, #501a1a); border-color: #d95050; color: #fca5a5; }
+    .p-blue   { background: linear-gradient(135deg, #1a2e42, #1a3552); border-color: var(--cyan); color: #a0e0e6; }
+    .p-yellow { background: linear-gradient(135deg, #3d2d0a, #4a350d); border-color: var(--amber); color: #fde68a; }
+    .p-green  { background: linear-gradient(135deg, #1a3a1a, #1d4a1d); border-color: var(--green); color: #86efac; }
+    .p-white  { background: linear-gradient(135deg, #2a2520, #332d28); border-color: #8a7e6f; color: var(--text); }
+    .p-gray   { background: var(--surface2); border-color: var(--border); color: var(--muted); }
+    .plate-bar {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      border-radius: 6px;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      font-size: 0.73rem;
+      color: var(--muted);
+      font-weight: 700;
+      font-family: var(--font-display);
+    }
+    .plate-empty {
+      font-size: 0.73rem;
+      color: var(--muted);
+      padding: 4px 0;
+    }
+
+    /* ── Warmup Ramp ──────────────────────────────────────────── */
+    .warmup-section {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .warmup-section h4 {
+      font-family: var(--font-display);
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .warmup-row { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+    .warmup-step {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      min-width: 56px;
+      transition: border-color .15s;
+    }
+    .warmup-step:hover { border-color: var(--border-l); }
+    .warmup-step .ws-wt  {
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .warmup-step .ws-rep {
+      font-size: 0.6rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .warmup-step.work {
+      border-color: var(--amber);
+      background: var(--amber-dim);
+    }
+    .warmup-step.work .ws-wt  { color: var(--amber); }
+    .warmup-step.work .ws-rep { color: var(--amber); opacity: .75; }
+    .warmup-arrow { color: var(--muted); font-size: 0.65rem; opacity: .5; }
+
+    /* ── Session Notes ────────────────────────────────────────── */
+    .notes-area {
+      margin-top: 14px;
+      font-size: 0.82rem;
+      resize: vertical;
+      min-height: 52px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+    }
+    .notes-area::placeholder { color: var(--muted); opacity: 0.6; }
+
+    /* ── Rest Timer ───────────────────────────────────────────── */
+    #timer-fab { position: fixed; bottom: calc(24px + env(safe-area-inset-bottom)); right: 20px; z-index: 100; }
+    .timer-btn-main {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--amber), #d4952f);
+      border: none;
+      color: var(--bg);
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow:
+        0 4px 20px rgba(232,168,73,0.35),
+        0 0 0 3px rgba(232,168,73,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s ease;
+    }
+    .timer-btn-main:hover {
+      transform: scale(1.08);
+      box-shadow:
+        0 6px 28px rgba(232,168,73,0.45),
+        0 0 0 4px rgba(232,168,73,0.15);
+    }
+    .timer-btn-main.running {
+      background: linear-gradient(135deg, var(--green), #4aaa4a);
+      box-shadow:
+        0 4px 20px rgba(109,206,109,0.35),
+        0 0 0 3px rgba(109,206,109,0.1);
+    }
+    .timer-popup {
+      position: fixed;
+      bottom: calc(96px + env(safe-area-inset-bottom));
+      right: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      width: 250px;
+      box-shadow:
+        0 12px 40px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+      display: none;
+      z-index: 101;
+    }
+    .timer-popup.open { display: block; animation: popIn .2s ease-out; }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .timer-display {
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: var(--amber);
+      font-variant-numeric: tabular-nums;
+      margin: 10px 0;
+      letter-spacing: -1px;
+      text-shadow: 0 0 30px var(--amber-glow);
+    }
+    .timer-display.done {
+      color: var(--green);
+      text-shadow: 0 0 30px rgba(109,206,109,0.2);
+    }
+    .timer-presets {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .timer-custom-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .timer-custom-row input { flex: 1; padding: 6px 10px; font-size: 0.8rem; }
+    .timer-controls { display: flex; gap: 8px; justify-content: center; }
+
+    /* ── Cycle note ───────────────────────────────────────────── */
+    .cycle-note {
+      font-size: 0.73rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--amber);
+    }
+
+    /* ── History ──────────────────────────────────────────────── */
+    .history-empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 28px;
+      font-size: 0.85rem;
+    }
+    .history-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-key {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .history-date { font-size: 0.73rem; color: var(--muted); margin-top: 2px; }
+    .history-note {
+      font-size: 0.73rem;
+      color: var(--muted);
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    /* ── No-1RM hint ──────────────────────────────────────────── */
+    .no-1rm-hint {
+      display: none;
+      background: var(--amber-dim);
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--amber);
+      margin-bottom: 16px;
+      font-family: var(--font-display);
+    }
+
+    /* ── Mentzer Heavy Duty Supplementals ──────────────────────── */
+    .mentzer-section {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .mentzer-section h4 {
+      font-family: var(--font-display);
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .mentzer-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .mentzer-card {
+      flex: 1;
+      min-width: 140px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      transition: border-color .15s;
+    }
+    .mentzer-card:hover { border-color: var(--border-l); }
+    .mentzer-card.done-day { opacity: .4; }
+    .mentzer-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.88rem;
+      margin-bottom: 5px;
+    }
+    .mentzer-wt {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--amber);
+    }
+    .mentzer-wt .unit {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-left: 2px;
+    }
+    .mentzer-note {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+    .mentzer-bump { margin-top: 8px; }
+    .mentzer-bump .btn { font-size: 0.68rem; padding: 4px 10px; }
+
+    /* ── Bump 1RM row ─────────────────────────────────────────── */
+    .bump-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 10px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    .bump-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 600;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    /* ── Scrollbar ────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border-l); }
+
+    /* ── Selection ────────────────────────────────────────────── */
+    ::selection { background: var(--amber); color: var(--bg); }
+
+    /* ── Entrance Animations ─────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card {
+      animation: fadeUp 0.4s ease-out both;
+    }
+    .card:nth-child(2) { animation-delay: 0.06s; }
+    .card:nth-child(3) { animation-delay: 0.12s; }
+    .card:nth-child(4) { animation-delay: 0.18s; }
+
+    /* ── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .app { padding: 12px 10px 100px; }
+      .header h1 { font-size: 1.6rem; }
+      .card { padding: 16px; }
+      .lift-wt { font-size: 1.25rem; }
+      .day-card { padding: 14px 12px; }
+      details.week summary { padding: 13px 14px; }
+      .timer-display { font-size: 2.2rem; }
+    }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <h1>Oly Program Calculator</h1>
-    <p class="sub">8-week (3×/wk) • TM + readiness + deload • back-off singles • autosave</p>
+<div class="app">
 
-    <div class="grid">
-      <div class="card">
-        <div class="inputRow">
-          <label>Snatch 1RM
-            <input id="snatch" type="number" step="0.5" value="215" />
+  <div class="header">
+    <h1><span>Oly</span> Program Calculator</h1>
+    <p>8-week cycle · 3×/wk · Training max & readiness · Back-off singles · Warmup ramp · Plate calc · Rest timer</p>
+  </div>
+
+  <!-- ── Inputs Card ──────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">Settings & 1RMs</div>
+    <div class="row">
+      <label>Snatch 1RM <input id="snatch" type="number" step="1" placeholder="0" /></label>
+      <label>Clean 1RM  <input id="clean"  type="number" step="1" placeholder="0" /></label>
+      <label>Jerk 1RM   <input id="jerk"   type="number" step="1" placeholder="0" /></label>
+    </div>
+    <div class="row">
+      <label>Back Squat 1RM <input id="bs" type="number" step="1" placeholder="0" /></label>
+      <label>Front Squat 1RM<input id="fs" type="number" step="1" placeholder="0" /></label>
+    </div>
+
+    <div class="row">
+      <label>Pull-up Weight <input id="pugwt" type="number" step="0.5" placeholder="0" /></label>
+      <label>Dip Weight <input id="dipwt" type="number" step="0.5" placeholder="0" /></label>
+    </div>
+
+    <div class="row">
+      <label>Units
+        <select id="unit">
+          <option value="lb" selected>lb</option>
+          <option value="kg">kg</option>
+        </select>
+      </label>
+      <label>Rounding increment
+        <input id="inc" type="number" step="0.5" value="5" />
+      </label>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row">
+      <label>Training Max (TM%) — applied to all lifts
+        <select id="tmAll">
+          <option value="1.00">100% (True 1RM)</option>
+          <option value="0.975">97.5%</option>
+          <option value="0.95">95%</option>
+          <option value="0.925" selected>92.5% (default)</option>
+          <option value="0.90">90%</option>
+        </select>
+      </label>
+      <label>Readiness
+        <select id="feel">
+          <option value="ok" selected>OK (normal)</option>
+          <option value="good">Good (+2.5% top work)</option>
+          <option value="bad">Bad (−5% top work)</option>
+        </select>
+      </label>
+      <label>Deload Mode
+        <select id="deload">
+          <option value="off" selected>OFF</option>
+          <option value="on">ON (−10% intensity, −40% sets)</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- ── Per-lift TM overrides ──────────────────────────────── -->
+    <details class="per-lift-tm" id="perLiftDetails">
+      <summary>Per-lift TM% Overrides <span id="perLiftArrow">▶</span></summary>
+      <div class="per-lift-body">
+        <div class="row">
+          <label>Snatch TM
+            <select id="tm_snatch">
+              <option value="auto">— use global —</option>
+              <option value="1.00">100%</option><option value="0.975">97.5%</option>
+              <option value="0.95">95%</option><option value="0.925">92.5%</option><option value="0.90">90%</option>
+            </select>
           </label>
-
-          <label>Clean 1RM
-            <input id="clean" type="number" step="0.5" value="300" />
+          <label>Clean TM
+            <select id="tm_clean">
+              <option value="auto">— use global —</option>
+              <option value="1.00">100%</option><option value="0.975">97.5%</option>
+              <option value="0.95">95%</option><option value="0.925">92.5%</option><option value="0.90">90%</option>
+            </select>
           </label>
-
-          <label>Jerk 1RM
-            <input id="jerk" type="number" step="0.5" value="285" />
+          <label>Jerk TM
+            <select id="tm_jerk">
+              <option value="auto">— use global —</option>
+              <option value="1.00">100%</option><option value="0.975">97.5%</option>
+              <option value="0.95">95%</option><option value="0.925">92.5%</option><option value="0.90">90%</option>
+            </select>
           </label>
-
-          <label>Back Squat 1RM
-            <input id="bs" type="number" step="0.5" value="380" />
+        </div>
+        <div class="row">
+          <label>Back Squat TM
+            <select id="tm_bs">
+              <option value="auto">— use global —</option>
+              <option value="1.00">100%</option><option value="0.975">97.5%</option>
+              <option value="0.95">95%</option><option value="0.925">92.5%</option><option value="0.90">90%</option>
+            </select>
           </label>
-
-          <label>Front Squat 1RM
-            <input id="fs" type="number" step="0.5" value="300" />
+          <label>Front Squat TM
+            <select id="tm_fs">
+              <option value="auto">— use global —</option>
+              <option value="1.00">100%</option><option value="0.975">97.5%</option>
+              <option value="0.95">95%</option><option value="0.925">92.5%</option><option value="0.90">90%</option>
+            </select>
           </label>
-
-          <div class="row">
-            <label style="flex:1;min-width:160px;">Units
-              <select id="unit">
-                <option value="lb" selected>lb</option>
-                <option value="kg">kg</option>
-              </select>
-            </label>
-
-            <label style="flex:1;min-width:160px;">Rounding increment
-              <input id="inc" type="number" step="0.5" value="5" />
-            </label>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="row">
-            <label style="flex:1;min-width:180px;">Training Max (TM%) — apply to all lifts
-              <select id="tmAll">
-                <option value="0.90">90%</option>
-                <option value="0.925" selected>92.5%</option>
-                <option value="0.95">95%</option>
-              </select>
-            </label>
-
-            <label style="flex:1;min-width:180px;">Readiness
-              <select id="feel">
-                <option value="ok" selected>OK</option>
-                <option value="good">Good (+2.5% top work)</option>
-                <option value="bad">Bad (-5% top work)</option>
-              </select>
-            </label>
-
-            <label style="flex:1;min-width:160px;">Deload Mode
-              <select id="deload">
-                <option value="off" selected>OFF</option>
-                <option value="on">ON (−10% intensity, −40% sets)</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="row">
-            <label style="flex:1;min-width:240px;">Filter (optional)
-              <input id="filter" type="text" placeholder="snatch, jerk, week 6, squat…" />
-            </label>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="toggleRow">
-            <button id="todayToggle" class="btn small primary">Today Mode: ON</button>
-            <div class="weeks" id="weekButtons"></div>
-            <div class="days" id="dayButtons"></div>
-          </div>
-
-          <div class="row">
-            <span class="pill on" id="currentPill">Week 1 • Day 1</span>
-            <span class="pill" id="countPill">0 lifts</span>
-            <span class="pill" id="feelPill">Readiness: OK</span>
-            <span class="pill" id="deloadPill">Deload: OFF</span>
-          </div>
-
-          <div class="footerRow">
-            <div class="muted">
-              Autosave: this device + browser (localStorage). Add to Home Screen for “app” feel.
-              <div class="miniHelp">Rules: miss → drop 3–5% and finish; cap 3 misses/lift/day. Back-off singles are baked in.</div>
-            </div>
-            <div class="rightActions">
-              <button id="exportCsv" class="btn">Export CSV</button>
-              <button id="resetProgress" class="btn">Reset progress</button>
-            </div>
-          </div>
         </div>
       </div>
+    </details>
 
-      <div class="card">
-        <div class="sectionTitle">Program</div>
-        <div id="program"></div>
+    <div class="divider"></div>
 
-        <div class="divider"></div>
-        <div class="muted">
-          Cycle intent: Weeks 1–3 accumulate (tech + squat base) • Week 4 deload/primer • Weeks 5–6 strength • Week 7 realization • Week 8 peak/test.
-        </div>
-      </div>
+    <div class="row">
+      <label>Filter (optional)
+        <input id="filter" type="text" placeholder="snatch, jerk, week 6, squat…" />
+      </label>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Week / Day nav -->
+    <div class="btn-row" style="margin-bottom:12px;">
+      <button class="btn sm primary" id="todayToggle">Today Mode: ON</button>
+      <div class="week-nav" id="weekButtons"></div>
+      <div class="week-nav" id="dayButtons"></div>
+    </div>
+
+    <div class="status-row">
+      <span class="pill on" id="currentPill">Week 1 · Day 1</span>
+      <span class="pill" id="countPill">0 lifts</span>
+      <span class="pill on" id="feelPill">Readiness: OK</span>
+      <span class="pill" id="deloadPill">Deload: OFF</span>
+      <span class="pill gold" id="tmPill">TM: 92.5%</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="bump-row">
+      <span class="bump-label">⬆ Bump all 1RMs:</span>
+      <button class="btn sm gold" id="bumpUp">+2.5 lb</button>
+      <button class="btn sm" id="bumpDown">−2.5 lb</button>
+    </div>
+
+    <div class="btn-row">
+      <span style="font-size:.72rem;color:var(--muted);flex:1;line-height:1.6;">
+        Autosave: inputs, progress, notes &amp; misses persist in localStorage.<br>
+        Rules: miss → drop ~3% per miss; cap 3 misses/lift/day. Back-off singles baked in.
+      </span>
+      <button class="btn sm" id="exportCsv">Export CSV</button>
+      <button class="btn sm danger" id="resetProgress">Reset progress</button>
     </div>
   </div>
 
+  <!-- ── Program Card ─────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">Program</div>
+    <div id="no1rmHint" class="no-1rm-hint">Enter your 1RM values above to see working weights, plate setups &amp; warmup ramps</div>
+    <div id="program"></div>
+    <div class="cycle-note">
+      Cycle intent: Weeks 1–3 accumulate (tech + squat base) · Week 4 deload/primer · Weeks 5–6 strength · Week 7 realization · Week 8 peak/test.
+    </div>
+  </div>
+
+  <!-- ── History Card ─────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">Completed Sessions</div>
+    <div id="history"></div>
+  </div>
+
+</div>
+
+<!-- ── Rest Timer FAB ────────────────────────────────────────── -->
+<div id="timer-fab">
+  <div class="timer-popup" id="timerPopup">
+    <div style="font-family:var(--font-display);font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Rest Timer</div>
+    <div class="timer-display" id="timerDisplay">2:00</div>
+    <div class="timer-presets">
+      <button class="btn sm" onclick="setTimer(60)">1m</button>
+      <button class="btn sm" onclick="setTimer(90)">90s</button>
+      <button class="btn sm primary" onclick="setTimer(120)">2m</button>
+      <button class="btn sm" onclick="setTimer(180)">3m</button>
+    </div>
+    <div class="timer-custom-row">
+      <input type="number" id="customTimerSec" min="10" max="900" step="5" placeholder="Custom (sec)" />
+      <button class="btn sm" onclick="setCustomTimer()">Set</button>
+    </div>
+    <div class="timer-controls">
+      <button class="btn sm primary" id="timerStartBtn" onclick="toggleTimer()">Start</button>
+      <button class="btn sm" onclick="resetTimer()">Reset</button>
+    </div>
+  </div>
+  <button class="timer-btn-main" id="timerFabBtn" onclick="toggleTimerPopup()" title="Rest Timer">⏱</button>
+</div>
+
 <script>
-  // ----------------------------
-  // FIXED Program Template (8 weeks)
-  // sources: snatch | clean | jerk | bs | fs | cj_combo
-  // cj_combo = min(clean%, jerk%) for combo work
-  //
-  // Notes:
-  // - Back-off singles are explicit rows on classic single days.
-  // - Week 4 is a deload/primer (no tests).
-  // - Week 8 Day 3 is the only test.
-  // ----------------------------
+// ─────────────────────────────────────────────────────────────────
+// PROGRAM DATA (8 weeks, v3)
+// ─────────────────────────────────────────────────────────────────
+const PROGRAM_8W = [
+  // WEEK 1 (accumulate - doubles, squat volume, speed pulls)
+  { week:1, day:1, items:[
+    { lift:"Snatch",                  sets:6, reps:2, pct:0.70, source:"snatch" },
+    { lift:"Snatch Pull (speed)",     sets:4, reps:3, pct:0.95, source:"snatch" },
+    { lift:"Back Squat (volume)",     sets:5, reps:5, pct:0.70, source:"bs" },
+  ]},
+  { week:1, day:2, items:[
+    { lift:"Jerk (rack/blocks)",      sets:6, reps:2, pct:0.72, source:"jerk" },
+    { lift:"Hang Clean (mid-thigh)",  sets:5, reps:2, pct:0.70, source:"clean" },
+    { lift:"Push Press",              sets:3, reps:5, pct:0.62, source:"jerk" },
+  ]},
+  { week:1, day:3, items:[
+    { lift:"Clean + Jerk (1+1)",      sets:5, reps:1, pct:0.70, source:"cj_combo" },
+    { lift:"Front Squat (heavy-ish)", sets:4, reps:3, pct:0.75, source:"fs" },
+    { lift:"Clean Pull (speed)",      sets:4, reps:3, pct:0.95, source:"clean" },
+    { lift:"Snatch Balance / OHS",    sets:4, reps:2, pct:0.60, source:"snatch" },
+  ]},
 
-  const PROGRAM_8W = [
-    // WEEK 1 (accumulate - doubles, squat volume, speed pulls)
-    { week: 1, day: 1, items: [
-      { lift: "Snatch", sets: 6, reps: 2, pct: 0.70, source: "snatch" },
-      { lift: "Snatch Pull (speed)", sets: 4, reps: 3, pct: 0.95, source: "snatch" },
-      { lift: "Back Squat (volume)", sets: 5, reps: 5, pct: 0.70, source: "bs" },
-    ]},
-    { week: 1, day: 2, items: [
-      { lift: "Jerk (rack/blocks)", sets: 6, reps: 2, pct: 0.72, source: "jerk" },
-      { lift: "Hang Clean (mid-thigh)", sets: 5, reps: 2, pct: 0.70, source: "clean" },
-      { lift: "Push Press", sets: 3, reps: 5, pct: 0.62, source: "jerk" },
-    ]},
-    { week: 1, day: 3, items: [
-      { lift: "Clean + Jerk (1+1)", sets: 5, reps: 1, pct: 0.70, source: "cj_combo" },
-      { lift: "Front Squat (heavy-ish)", sets: 4, reps: 3, pct: 0.75, source: "fs" },
-      { lift: "Clean Pull (speed)", sets: 4, reps: 3, pct: 0.95, source: "clean" },
-      { lift: "Snatch Balance / OHS", sets: 4, reps: 2, pct: 0.60, source: "snatch" },
-    ]},
+  // WEEK 2 (accumulate - slightly heavier, strength pulls)
+  { week:2, day:1, items:[
+    { lift:"Snatch",                  sets:6, reps:2, pct:0.75, source:"snatch" },
+    { lift:"Snatch Pull (strength)",  sets:4, reps:2, pct:1.05, source:"snatch" },
+    { lift:"Back Squat (volume)",     sets:5, reps:4, pct:0.75, source:"bs" },
+  ]},
+  { week:2, day:2, items:[
+    { lift:"Jerk (rack/blocks)",      sets:6, reps:2, pct:0.76, source:"jerk" },
+    { lift:"Paused Clean (knee)",     sets:5, reps:2, pct:0.73, source:"clean" },
+    { lift:"Push Press",              sets:3, reps:5, pct:0.65, source:"jerk" },
+  ]},
+  { week:2, day:3, items:[
+    { lift:"Clean + Jerk (1+1)",      sets:6, reps:1, pct:0.75, source:"cj_combo" },
+    { lift:"Front Squat (heavy-ish)", sets:5, reps:3, pct:0.78, source:"fs" },
+    { lift:"Clean Pull (strength)",   sets:4, reps:2, pct:1.10, source:"clean" },
+    { lift:"Snatch Balance / OHS",    sets:4, reps:2, pct:0.62, source:"snatch" },
+  ]},
 
-    // WEEK 2 (accumulate - slightly heavier, strength pulls)
-    { week: 2, day: 1, items: [
-      { lift: "Snatch", sets: 6, reps: 2, pct: 0.75, source: "snatch" },
-      { lift: "Snatch Pull (strength)", sets: 4, reps: 2, pct: 1.05, source: "snatch" },
-      { lift: "Back Squat (volume)", sets: 5, reps: 4, pct: 0.75, source: "bs" },
-    ]},
-    { week: 2, day: 2, items: [
-      { lift: "Jerk (rack/blocks)", sets: 6, reps: 2, pct: 0.76, source: "jerk" },
-      { lift: "Paused Clean (knee)", sets: 5, reps: 2, pct: 0.73, source: "clean" },
-      { lift: "Push Press", sets: 3, reps: 5, pct: 0.65, source: "jerk" },
-    ]},
-    { week: 2, day: 3, items: [
-      { lift: "Clean + Jerk (1+1)", sets: 6, reps: 1, pct: 0.75, source: "cj_combo" },
-      { lift: "Front Squat (heavy-ish)", sets: 5, reps: 3, pct: 0.78, source: "fs" },
-      { lift: "Clean Pull (strength)", sets: 4, reps: 2, pct: 1.10, source: "clean" },
-      { lift: "Snatch Balance / OHS", sets: 4, reps: 2, pct: 0.62, source: "snatch" },
-    ]},
+  // WEEK 3 (accumulate → transition to singles + back-offs)
+  { week:3, day:1, items:[
+    { lift:"Snatch (top singles)",       sets:5, reps:1, pct:0.80, source:"snatch", tag:"TOP" },
+    { lift:"Snatch (back-off singles)",  sets:4, reps:1, pct:0.74, source:"snatch", tag:"BACKOFF" },
+    { lift:"Snatch Pull (speed)",        sets:4, reps:3, pct:1.00, source:"snatch" },
+    { lift:"Back Squat (volume)",        sets:5, reps:3, pct:0.80, source:"bs" },
+  ]},
+  { week:3, day:2, items:[
+    { lift:"Jerk (top singles)",         sets:5, reps:1, pct:0.80, source:"jerk",  tag:"TOP" },
+    { lift:"Jerk (back-off singles)",    sets:3, reps:1, pct:0.74, source:"jerk",  tag:"BACKOFF" },
+    { lift:"Clean (top singles)",        sets:5, reps:1, pct:0.78, source:"clean", tag:"TOP" },
+    { lift:"Clean (back-off singles)",   sets:3, reps:1, pct:0.72, source:"clean", tag:"BACKOFF" },
+  ]},
+  { week:3, day:3, items:[
+    { lift:"Clean + Jerk (top singles)",      sets:5, reps:1, pct:0.80, source:"cj_combo", tag:"TOP" },
+    { lift:"Clean + Jerk (back-off singles)", sets:3, reps:1, pct:0.74, source:"cj_combo", tag:"BACKOFF" },
+    { lift:"Front Squat (heavier)",           sets:5, reps:2, pct:0.82, source:"fs" },
+    { lift:"Clean Pull (speed)",              sets:4, reps:3, pct:1.00, source:"clean" },
+    { lift:"OHS (tech)",                      sets:3, reps:3, pct:0.55, source:"snatch" },
+  ]},
 
-    // WEEK 3 (accumulate → transition to singles + back-offs; speed pulls)
-    { week: 3, day: 1, items: [
-      { lift: "Snatch (top singles)", sets: 5, reps: 1, pct: 0.80, source: "snatch", tag: "TOP" },
-      { lift: "Snatch (back-off singles)", sets: 4, reps: 1, pct: 0.74, source: "snatch", tag: "BACKOFF" },
-      { lift: "Snatch Pull (speed)", sets: 4, reps: 3, pct: 1.00, source: "snatch" },
-      { lift: "Back Squat (volume)", sets: 5, reps: 3, pct: 0.80, source: "bs" },
-    ]},
-    { week: 3, day: 2, items: [
-      { lift: "Jerk (top singles)", sets: 5, reps: 1, pct: 0.80, source: "jerk", tag: "TOP" },
-      { lift: "Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.74, source: "jerk", tag: "BACKOFF" },
-      { lift: "Clean (top singles)", sets: 5, reps: 1, pct: 0.78, source: "clean", tag: "TOP" },
-      { lift: "Clean (back-off singles)", sets: 3, reps: 1, pct: 0.72, source: "clean", tag: "BACKOFF" },
-    ]},
-    { week: 3, day: 3, items: [
-      { lift: "Clean + Jerk (top singles)", sets: 5, reps: 1, pct: 0.80, source: "cj_combo", tag: "TOP" },
-      { lift: "Clean + Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.74, source: "cj_combo", tag: "BACKOFF" },
-      { lift: "Front Squat (heavier)", sets: 5, reps: 2, pct: 0.82, source: "fs" },
-      { lift: "Clean Pull (speed)", sets: 4, reps: 3, pct: 1.00, source: "clean" },
-      { lift: "OHS (tech)", sets: 3, reps: 3, pct: 0.55, source: "snatch" },
-    ]},
+  // WEEK 4 (DELOAD / PRIMER)
+  { week:4, day:1, items:[
+    { lift:"Snatch (fast singles)", sets:5, reps:1, pct:0.78, source:"snatch" },
+    { lift:"Back Squat (light)",    sets:3, reps:3, pct:0.70, source:"bs" },
+  ]},
+  { week:4, day:2, items:[
+    { lift:"Jerk (fast singles)",  sets:4, reps:1, pct:0.78, source:"jerk" },
+    { lift:"Clean (fast singles)", sets:4, reps:1, pct:0.76, source:"clean" },
+  ]},
+  { week:4, day:3, items:[
+    { lift:"Clean + Jerk (fast singles)", sets:4, reps:1, pct:0.78, source:"cj_combo" },
+    { lift:"Front Squat (light)",         sets:3, reps:2, pct:0.70, source:"fs" },
+  ]},
 
-    // WEEK 4 (DELOAD / PRIMER - no tests; reduce volume)
-    { week: 4, day: 1, items: [
-      { lift: "Snatch (fast singles)", sets: 5, reps: 1, pct: 0.78, source: "snatch" },
-      { lift: "Back Squat (light)", sets: 3, reps: 3, pct: 0.70, source: "bs" },
-    ]},
-    { week: 4, day: 2, items: [
-      { lift: "Jerk (fast singles)", sets: 4, reps: 1, pct: 0.78, source: "jerk" },
-      { lift: "Clean (fast singles)", sets: 4, reps: 1, pct: 0.76, source: "clean" },
-    ]},
-    { week: 4, day: 3, items: [
-      { lift: "Clean + Jerk (fast singles)", sets: 4, reps: 1, pct: 0.78, source: "cj_combo" },
-      { lift: "Front Squat (light)", sets: 3, reps: 2, pct: 0.70, source: "fs" },
-    ]},
+  // WEEK 5 (STRENGTH - heavier singles + back-offs)
+  { week:5, day:1, items:[
+    { lift:"Snatch (top singles)",       sets:5, reps:1, pct:0.84, source:"snatch", tag:"TOP" },
+    { lift:"Snatch (back-off singles)",  sets:4, reps:1, pct:0.78, source:"snatch", tag:"BACKOFF" },
+    { lift:"Back Squat (heavy)",         sets:5, reps:3, pct:0.82, source:"bs" },
+    { lift:"Snatch Pull (strength)",     sets:4, reps:2, pct:1.10, source:"snatch" },
+  ]},
+  { week:5, day:2, items:[
+    { lift:"Jerk (top singles)",         sets:5, reps:1, pct:0.84, source:"jerk",  tag:"TOP" },
+    { lift:"Jerk (back-off singles)",    sets:3, reps:1, pct:0.78, source:"jerk",  tag:"BACKOFF" },
+    { lift:"Clean (top singles)",        sets:5, reps:1, pct:0.82, source:"clean", tag:"TOP" },
+    { lift:"Clean (back-off singles)",   sets:3, reps:1, pct:0.76, source:"clean", tag:"BACKOFF" },
+  ]},
+  { week:5, day:3, items:[
+    { lift:"Clean + Jerk (top singles)",      sets:5, reps:1, pct:0.84, source:"cj_combo", tag:"TOP" },
+    { lift:"Clean + Jerk (back-off singles)", sets:3, reps:1, pct:0.78, source:"cj_combo", tag:"BACKOFF" },
+    { lift:"Front Squat (heavy)",             sets:4, reps:2, pct:0.85, source:"fs" },
+    { lift:"Clean Pull (strength)",           sets:4, reps:2, pct:1.12, source:"clean" },
+    { lift:"Snatch Balance",                  sets:3, reps:2, pct:0.60, source:"snatch" },
+  ]},
 
-    // WEEK 5 (STRENGTH - heavier singles + back-offs; strength pulls; heavier squats)
-    { week: 5, day: 1, items: [
-      { lift: "Snatch (top singles)", sets: 5, reps: 1, pct: 0.84, source: "snatch", tag: "TOP" },
-      { lift: "Snatch (back-off singles)", sets: 4, reps: 1, pct: 0.78, source: "snatch", tag: "BACKOFF" },
-      { lift: "Back Squat (heavy)", sets: 5, reps: 3, pct: 0.82, source: "bs" },
-      { lift: "Snatch Pull (strength)", sets: 4, reps: 2, pct: 1.10, source: "snatch" },
-    ]},
-    { week: 5, day: 2, items: [
-      { lift: "Jerk (top singles)", sets: 5, reps: 1, pct: 0.84, source: "jerk", tag: "TOP" },
-      { lift: "Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.78, source: "jerk", tag: "BACKOFF" },
-      { lift: "Clean (top singles)", sets: 5, reps: 1, pct: 0.82, source: "clean", tag: "TOP" },
-      { lift: "Clean (back-off singles)", sets: 3, reps: 1, pct: 0.76, source: "clean", tag: "BACKOFF" },
-    ]},
-    { week: 5, day: 3, items: [
-      { lift: "Clean + Jerk (top singles)", sets: 5, reps: 1, pct: 0.84, source: "cj_combo", tag: "TOP" },
-      { lift: "Clean + Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.78, source: "cj_combo", tag: "BACKOFF" },
-      { lift: "Front Squat (heavy)", sets: 4, reps: 2, pct: 0.85, source: "fs" },
-      { lift: "Clean Pull (strength)", sets: 4, reps: 2, pct: 1.12, source: "clean" },
-      { lift: "Snatch Balance", sets: 3, reps: 2, pct: 0.60, source: "snatch" },
-    ]},
+  // WEEK 6 (STRENGTH - slightly heavier, lower reps)
+  { week:6, day:1, items:[
+    { lift:"Snatch (top singles)",       sets:4, reps:1, pct:0.87, source:"snatch", tag:"TOP" },
+    { lift:"Snatch (back-off singles)",  sets:4, reps:1, pct:0.80, source:"snatch", tag:"BACKOFF" },
+    { lift:"Back Squat (heavy)",         sets:5, reps:2, pct:0.86, source:"bs" },
+    { lift:"Snatch Pull (strength)",     sets:4, reps:2, pct:1.12, source:"snatch" },
+  ]},
+  { week:6, day:2, items:[
+    { lift:"Jerk (top singles)",         sets:4, reps:1, pct:0.87, source:"jerk",  tag:"TOP" },
+    { lift:"Jerk (back-off singles)",    sets:3, reps:1, pct:0.80, source:"jerk",  tag:"BACKOFF" },
+    { lift:"Clean (top singles)",        sets:4, reps:1, pct:0.85, source:"clean", tag:"TOP" },
+    { lift:"Clean (back-off singles)",   sets:3, reps:1, pct:0.78, source:"clean", tag:"BACKOFF" },
+  ]},
+  { week:6, day:3, items:[
+    { lift:"Clean + Jerk (top singles)",      sets:4, reps:1, pct:0.87, source:"cj_combo", tag:"TOP" },
+    { lift:"Clean + Jerk (back-off singles)", sets:3, reps:1, pct:0.80, source:"cj_combo", tag:"BACKOFF" },
+    { lift:"Front Squat (heavy)",             sets:3, reps:1, pct:0.88, source:"fs" },
+    { lift:"Clean Pull (strength)",           sets:4, reps:2, pct:1.15, source:"clean" },
+  ]},
 
-    // WEEK 6 (STRENGTH - slightly heavier, lower reps)
-    { week: 6, day: 1, items: [
-      { lift: "Snatch (top singles)", sets: 4, reps: 1, pct: 0.87, source: "snatch", tag: "TOP" },
-      { lift: "Snatch (back-off singles)", sets: 4, reps: 1, pct: 0.80, source: "snatch", tag: "BACKOFF" },
-      { lift: "Back Squat (heavy)", sets: 5, reps: 2, pct: 0.86, source: "bs" },
-      { lift: "Snatch Pull (strength)", sets: 4, reps: 2, pct: 1.12, source: "snatch" },
-    ]},
-    { week: 6, day: 2, items: [
-      { lift: "Jerk (top singles)", sets: 4, reps: 1, pct: 0.87, source: "jerk", tag: "TOP" },
-      { lift: "Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.80, source: "jerk", tag: "BACKOFF" },
-      { lift: "Clean (top singles)", sets: 4, reps: 1, pct: 0.85, source: "clean", tag: "TOP" },
-      { lift: "Clean (back-off singles)", sets: 3, reps: 1, pct: 0.78, source: "clean", tag: "BACKOFF" },
-    ]},
-    { week: 6, day: 3, items: [
-      { lift: "Clean + Jerk (top singles)", sets: 4, reps: 1, pct: 0.87, source: "cj_combo", tag: "TOP" },
-      { lift: "Clean + Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.80, source: "cj_combo", tag: "BACKOFF" },
-      { lift: "Front Squat (heavy)", sets: 3, reps: 1, pct: 0.88, source: "fs" },
-      { lift: "Clean Pull (strength)", sets: 4, reps: 2, pct: 1.15, source: "clean" },
-    ]},
+  // WEEK 7 (REALIZATION - low volume, heavy singles)
+  { week:7, day:1, items:[
+    { lift:"Snatch (heavy singles)",         sets:4, reps:1, pct:0.90, source:"snatch", tag:"TOP" },
+    { lift:"Snatch (back-off singles)",      sets:3, reps:1, pct:0.84, source:"snatch", tag:"BACKOFF" },
+    { lift:"Back Squat (single exposure)",   sets:3, reps:1, pct:0.90, source:"bs" },
+  ]},
+  { week:7, day:2, items:[
+    { lift:"Clean + Jerk (heavy singles)",        sets:4, reps:1, pct:0.90, source:"cj_combo", tag:"TOP" },
+    { lift:"Clean + Jerk (back-off singles)",     sets:3, reps:1, pct:0.84, source:"cj_combo", tag:"BACKOFF" },
+  ]},
+  { week:7, day:3, items:[
+    { lift:"Jerk (heavy singles)",           sets:4, reps:1, pct:0.90, source:"jerk", tag:"TOP" },
+    { lift:"Jerk (back-off singles)",        sets:2, reps:1, pct:0.84, source:"jerk", tag:"BACKOFF" },
+    { lift:"Front Squat (single exposure)",  sets:3, reps:1, pct:0.90, source:"fs" },
+  ]},
 
-    // WEEK 7 (REALIZATION - low volume, heavy clean singles, no grind)
-    { week: 7, day: 1, items: [
-      { lift: "Snatch (heavy clean singles)", sets: 4, reps: 1, pct: 0.90, source: "snatch", tag: "TOP" },
-      { lift: "Snatch (back-off singles)", sets: 3, reps: 1, pct: 0.84, source: "snatch", tag: "BACKOFF" },
-      { lift: "Back Squat (single exposure)", sets: 3, reps: 1, pct: 0.90, source: "bs" },
-    ]},
-    { week: 7, day: 2, items: [
-      { lift: "Clean + Jerk (heavy clean singles)", sets: 4, reps: 1, pct: 0.90, source: "cj_combo", tag: "TOP" },
-      { lift: "Clean + Jerk (back-off singles)", sets: 3, reps: 1, pct: 0.84, source: "cj_combo", tag: "BACKOFF" },
-    ]},
-    { week: 7, day: 3, items: [
-      { lift: "Jerk (heavy clean singles)", sets: 4, reps: 1, pct: 0.90, source: "jerk", tag: "TOP" },
-      { lift: "Jerk (back-off singles)", sets: 2, reps: 1, pct: 0.84, source: "jerk", tag: "BACKOFF" },
-      { lift: "Front Squat (single exposure)", sets: 3, reps: 1, pct: 0.90, source: "fs" },
-    ]},
+  // WEEK 8 (PEAK/TEST)
+  { week:8, day:1, items:[
+    { lift:"Snatch (opener practice)",        sets:3, reps:1, pct:0.88, source:"snatch" },
+    { lift:"Clean + Jerk (opener practice)",  sets:3, reps:1, pct:0.88, source:"cj_combo" },
+  ]},
+  { week:8, day:2, items:[
+    { lift:"Snatch (very light)",  sets:3, reps:1, pct:0.70, source:"snatch" },
+    { lift:"Jerk (very light)",    sets:3, reps:1, pct:0.70, source:"jerk" },
+  ]},
+  { week:8, day:3, items:[
+    { lift:"TEST: Snatch (attempts)",       sets:3, reps:1, pct:1.00, source:"snatch",   tag:"TEST" },
+    { lift:"TEST: Clean + Jerk (attempts)", sets:3, reps:1, pct:1.00, source:"cj_combo", tag:"TEST" },
+  ]},
+];
 
-    // WEEK 8 (PEAK/TEST)
-    { week: 8, day: 1, items: [
-      { lift: "Snatch (opener practice)", sets: 3, reps: 1, pct: 0.88, source: "snatch" },
-      { lift: "Clean + Jerk (opener practice)", sets: 3, reps: 1, pct: 0.88, source: "cj_combo" },
-    ]},
-    { week: 8, day: 2, items: [
-      { lift: "Snatch (very light)", sets: 3, reps: 1, pct: 0.70, source: "snatch" },
-      { lift: "Jerk (very light)", sets: 3, reps: 1, pct: 0.70, source: "jerk" },
-    ]},
-    { week: 8, day: 3, items: [
-      { lift: "TEST: Snatch (attempts)", sets: 3, reps: 1, pct: 1.00, source: "snatch", tag: "TEST" },
-      { lift: "TEST: Clean + Jerk (attempts)", sets: 3, reps: 1, pct: 1.00, source: "cj_combo", tag: "TEST" },
-    ]},
-  ];
+// ─────────────────────────────────────────────────────────────────
+// PLATE DATA
+// ─────────────────────────────────────────────────────────────────
+const LB_PLATES = [55,45,35,25,10,5,2.5];
+const KG_PLATES = [25,20,15,10,5,2.5,1.25];
+const BAR_LB = 45, BAR_KG = 20;
 
-  // ----------------------------
-  // State + Autosave
-  // ----------------------------
-  const STORAGE_KEY = "oly_prog_state_v2_fixed";
-  const defaultState = {
-    currentWeek: 1,
-    currentDay: 1,
-    todayMode: true,
-    expandedWeeks: [1],
-    completed: {}, // "W1-D2": true
+function plateColor(plate, unit) {
+  if(unit==="lb") {
+    if(plate===55) return "p-red";
+    if(plate===45) return "p-blue";
+    if(plate===35) return "p-yellow";
+    if(plate===25) return "p-green";
+    return "p-white";
+  } else {
+    if(plate===25) return "p-red";
+    if(plate===20) return "p-blue";
+    if(plate===15) return "p-yellow";
+    if(plate===10) return "p-green";
+    if(plate===5)  return "p-white";
+    return "p-gray";
+  }
+}
+
+function calcPlates(target, unit) {
+  const bar = unit==="lb" ? BAR_LB : BAR_KG;
+  const plates = unit==="lb" ? LB_PLATES : KG_PLATES;
+  let rem = (target - bar) / 2;
+  if(rem <= 0) return [];
+  const result = [];
+  for(const p of plates) {
+    if(rem <= 0) break;
+    const n = Math.floor(rem / p);
+    if(n > 0) { result.push({plate:p, count:n}); rem -= n*p; }
+  }
+  return result;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────
+const STORAGE_KEY  = "oly_prog_v3";
+const INPUTS_KEY   = "oly_inputs_v3";
+
+const DEFAULT_STATE = {
+  currentWeek: 1, currentDay: 1, todayMode: true,
+  expandedWeeks: [1],
+  completed: {},   // { "W1-D1": { ts: 123 } }
+  misses: {},      // { "W1-D1-lift_key": count }
+  notes: {},       // { "W1-D1": "text" }
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return {...DEFAULT_STATE};
+    const s = JSON.parse(raw);
+    return { ...DEFAULT_STATE, ...s,
+      expandedWeeks: Array.isArray(s.expandedWeeks) ? s.expandedWeeks : [1],
+      completed: (s.completed && typeof s.completed==="object") ? s.completed : {},
+      misses:    (s.misses    && typeof s.misses==="object")    ? s.misses    : {},
+      notes:     (s.notes     && typeof s.notes==="object")     ? s.notes     : {},
+    };
+  } catch(e) { return {...DEFAULT_STATE}; }
+}
+function saveState(s) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch(e){} }
+
+const INPUT_FIELDS = ["snatch","clean","jerk","bs","fs","pugwt","dipwt","unit","inc","tmAll","feel","deload","tm_snatch","tm_clean","tm_jerk","tm_bs","tm_fs"];
+function saveInputs() {
+  const obj = {};
+  INPUT_FIELDS.forEach(id => { const el=document.getElementById(id); if(el) obj[id]=el.value; });
+  try { localStorage.setItem(INPUTS_KEY, JSON.stringify(obj)); } catch(e) {}
+}
+function loadInputs() {
+  try {
+    const raw = localStorage.getItem(INPUTS_KEY);
+    if(!raw) return;
+    const obj = JSON.parse(raw);
+    INPUT_FIELDS.forEach(id => { const el=document.getElementById(id); if(el && obj[id]!==undefined) el.value=obj[id]; });
+  } catch(e) {}
+}
+
+let state = loadState();
+
+// ─────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────
+function num(id) { const n=Number(document.getElementById(id).value); return isFinite(n)?n:0; }
+function val(id) { return document.getElementById(id).value; }
+function roundInc(x, inc) { return Math.round(x/inc)*inc; }
+
+function isTopWork(item) {
+  return item.tag==="TOP" || /opener|heavy.*singles/i.test(item.lift);
+}
+
+function missKey(week, day, liftName) {
+  return `W${week}-D${day}-${liftName.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase()}`;
+}
+
+function getInputs() {
+  const globalTM = Number(val("tmAll"));
+  const perLift = lift => {
+    const v = val(`tm_${lift}`);
+    return (v && v !== "auto") ? Number(v) : globalTM;
   };
+  return {
+    snatch: num("snatch"), clean: num("clean"), jerk: num("jerk"),
+    bs: num("bs"), fs: num("fs"),
+    pugwt: num("pugwt"), dipwt: num("dipwt"),
+    unit: val("unit"), inc: num("inc") || (val("unit")==="lb" ? 5 : 2.5),
+    filter: (document.getElementById("filter").value||"").trim().toLowerCase(),
+    tm: globalTM,
+    tmPerLift: { snatch:perLift("snatch"), clean:perLift("clean"), jerk:perLift("jerk"), bs:perLift("bs"), fs:perLift("fs") },
+    feel: val("feel"),
+    deload: val("deload"),
+  };
+}
 
-  function loadState(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return {...defaultState};
-      const s = JSON.parse(raw);
-      return {
-        ...defaultState,
-        ...s,
-        expandedWeeks: Array.isArray(s.expandedWeeks) ? s.expandedWeeks : defaultState.expandedWeeks,
-        completed: (s.completed && typeof s.completed === "object") ? s.completed : {},
-      };
-    }catch(e){
-      return {...defaultState};
+function computeRows(inp) {
+  const one = {
+    snatch: inp.snatch * inp.tmPerLift.snatch,
+    clean:  inp.clean  * inp.tmPerLift.clean,
+    jerk:   inp.jerk   * inp.tmPerLift.jerk,
+    bs:     inp.bs     * inp.tmPerLift.bs,
+    fs:     inp.fs     * inp.tmPerLift.fs,
+  };
+  const feelAdj = inp.feel==="good" ? 0.025 : inp.feel==="bad" ? -0.05 : 0;
+  const out = [];
+  for(const d of PROGRAM_8W) {
+    for(const it of d.items) {
+      let pct = it.pct;
+      if(isTopWork(it)) pct += feelAdj;
+      let sets = it.sets;
+      if(inp.deload==="on") { pct *= 0.90; sets = Math.max(1, Math.round(sets*0.6)); }
+      let raw = 0, limitedBy = null;
+      if(it.source==="cj_combo") {
+        const cw = (one.clean||0)*pct, jw = (one.jerk||0)*pct;
+        limitedBy = cw <= jw ? "clean" : "jerk";
+        raw = Math.min(cw, jw);
+      } else {
+        const base = {snatch:one.snatch,clean:one.clean,jerk:one.jerk,bs:one.bs,fs:one.fs}[it.source]||0;
+        raw = base * pct;
+      }
+      const w = roundInc(raw, inp.inc);
+      out.push({
+        week:d.week, day:d.day, lift:it.lift, sets, reps:it.reps,
+        pct:Math.round(pct*100), source:it.source, tag:it.tag||"",
+        weight:w, unit:inp.unit, limitedBy,
+        note:(inp.deload==="on"?"DELOAD ":"")+(inp.feel?`FEEL:${inp.feel}`:""),
+      });
     }
   }
-  function saveState(s){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }catch(e){} }
+  return out;
+}
 
-  // ----------------------------
-  // Helpers
-  // ----------------------------
-  function roundToIncrement(x, inc){ return Math.round(x / inc) * inc; }
-  function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+function getWeekPhase(w) {
+  if(w<=3) return ["ACCUMULATE","phase-acc"];
+  if(w===4) return ["DELOAD","phase-del"];
+  if(w<=6) return ["STRENGTH","phase-str"];
+  if(w===7) return ["REALIZE","phase-rea"];
+  return ["PEAK/TEST","phase-pek"];
+}
 
-  function getInputs(){
-    return {
-      snatch: num(document.getElementById("snatch").value),
-      clean:  num(document.getElementById("clean").value),
-      jerk:   num(document.getElementById("jerk").value),
-      bs:     num(document.getElementById("bs").value),
-      fs:     num(document.getElementById("fs").value),
-      unit: document.getElementById("unit").value,
-      inc: num(document.getElementById("inc").value),
-      filter: (document.getElementById("filter").value || "").trim().toLowerCase(),
-      tmAll: Number(document.getElementById("tmAll").value),
-      feel: document.getElementById("feel").value,
-      deload: document.getElementById("deload").value,
-    };
+// ─────────────────────────────────────────────────────────────────
+// WARMUP RAMP
+// ─────────────────────────────────────────────────────────────────
+function computeWarmups(workWeight, unit, inc) {
+  if(workWeight <= 0) return [];
+  const bar = unit==="lb" ? BAR_LB : BAR_KG;
+  const steps = [{pct:0.40,reps:5},{pct:0.55,reps:3},{pct:0.70,reps:2},{pct:0.85,reps:1}];
+  const result = [];
+  let prev = -1;
+  for(const s of steps) {
+    const w = Math.max(bar, roundInc(workWeight * s.pct, inc));
+    if(w >= workWeight || w === prev) continue;
+    result.push({ weight:w, reps:s.reps });
+    prev = w;
+  }
+  return result;
+}
+
+function renderWarmups(workWeight, unit, inc) {
+  const steps = computeWarmups(workWeight, unit, inc);
+  if(!steps.length) return "";
+  let html = `<div class="warmup-section"><h4>Warmup ramp</h4><div class="warmup-row">`;
+  for(const s of steps) {
+    html += `<div class="warmup-step"><span class="ws-wt">${s.weight}${unit}</span><span class="ws-rep">${s.reps} rep${s.reps>1?"s":""}</span></div><span class="warmup-arrow">→</span>`;
+  }
+  html += `<div class="warmup-step work"><span class="ws-wt">${workWeight}${unit}</span><span class="ws-rep">work</span></div>`;
+  html += `</div></div>`;
+  return html;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// MENTZER HEAVY DUTY SUPPLEMENTALS
+// ─────────────────────────────────────────────────────────────────
+function bumpMentzer(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  const unit = val("unit");
+  const amt = unit === "kg" ? 1.25 : 2.5;
+  el.value = Math.max(0, (Number(el.value)||0) + amt);
+  saveInputs();
+  renderAll();
+}
+
+function renderMentzerSection(inp, isDone) {
+  if(inp.pugwt <= 0 && inp.dipwt <= 0) return "";
+  const doneClass = isDone ? " done-day" : "";
+  const u = inp.unit;
+  const bumpLabel = u === "kg" ? "+1.25kg" : "+2.5lb";
+  let html = `<div class="mentzer-section"><h4>Heavy Duty Supplementals</h4><div class="mentzer-row">`;
+
+  if(inp.pugwt > 0) {
+    html += `<div class="mentzer-card${doneClass}">
+      <div class="mentzer-name">Weighted Pull-ups</div>
+      <div class="mentzer-wt">${inp.pugwt}<span class="unit">${u}</span></div>
+      <div class="mentzer-note">1 set to failure · Add weight at 10 reps</div>
+      <div class="mentzer-bump"><button class="btn sm gold mentzer-btn" data-mentzer="pugwt">Hit 10 → ${bumpLabel}</button></div>
+    </div>`;
+  }
+  if(inp.dipwt > 0) {
+    html += `<div class="mentzer-card${doneClass}">
+      <div class="mentzer-name">Weighted Dips</div>
+      <div class="mentzer-wt">${inp.dipwt}<span class="unit">${u}</span></div>
+      <div class="mentzer-note">1 set to failure · Add weight at 10 reps</div>
+      <div class="mentzer-bump"><button class="btn sm gold mentzer-btn" data-mentzer="dipwt">Hit 10 → ${bumpLabel}</button></div>
+    </div>`;
   }
 
-  function applyReadinessPctAdj(item, inputs){
-    // Only adjust "top work" (tag TOP) and classic/near-classic singles by a small amount.
-    // For simplicity: adjust if tag TOP or lift includes "opener" or "heavy clean singles".
-    const isTop = (item.tag === "TOP") || /opener|heavy clean singles/i.test(item.lift);
-    if(!isTop) return 0;
-    if(inputs.feel === "good") return 0.025;
-    if(inputs.feel === "bad")  return -0.05;
-    return 0;
+  html += `</div></div>`;
+  return html;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// PLATE RENDER
+// ─────────────────────────────────────────────────────────────────
+function renderPlates(weight, unit) {
+  const bar = unit==="lb" ? BAR_LB : BAR_KG;
+  if(weight <= 0) return "";
+  if(weight <= bar) return `<div class="plate-section"><h4>Plates per side</h4><div class="plate-empty">Empty bar — ${bar}${unit}</div></div>`;
+  const plates = calcPlates(weight, unit);
+  if(!plates.length) return "";
+  let html = `<div class="plate-section"><h4>Plates per side (bar = ${bar}${unit})</h4><div class="plate-row">`;
+  html += `<div class="plate-bar">${bar}${unit}</div>`;
+  for(const {plate,count} of plates) {
+    html += `<div class="plate-chip ${plateColor(plate,unit)}"><span class="p-weight">${plate}</span><span class="p-count">×${count}</span></div>`;
   }
+  html += "</div></div>";
+  return html;
+}
 
-  function computeRows(inputs){
-    const tm = inputs.tmAll || 0.925;
-    const one = {
-      snatch: inputs.snatch * tm,
-      clean:  inputs.clean  * tm,
-      jerk:   inputs.jerk   * tm,
-      bs:     inputs.bs     * tm,
-      fs:     inputs.fs     * tm,
-    };
+// ─────────────────────────────────────────────────────────────────
+// BUMP ALL 1RMs
+// ─────────────────────────────────────────────────────────────────
+function bumpLifts(direction) {
+  const unit = val("unit");
+  const amt  = direction * (unit === "kg" ? 1.25 : 2.5);
+  ["snatch","clean","jerk","bs","fs"].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const v = Number(el.value) || 0;
+    if(v > 0) el.value = Math.max(0, v + amt);
+  });
+  saveInputs();
+  renderAll();
+}
 
-    const out = [];
-    for(const d of PROGRAM_8W){
-      for(const it of d.items){
-        let pct = it.pct;
+// ─────────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────────
+function renderControls() {
+  const wb = document.getElementById("weekButtons");
+  wb.innerHTML = '<span class="label">W:</span>';
+  for(let w=1;w<=8;w++) {
+    const b = document.createElement("button");
+    b.className = "btn sm"+(state.currentWeek===w?" primary":"");
+    b.textContent = w;
+    b.onclick = ()=>{ state.currentWeek=w; state.currentDay=1; state.todayMode=true; if(!state.expandedWeeks.includes(w)) state.expandedWeeks.push(w); saveState(state); renderAll(); };
+    wb.appendChild(b);
+  }
+  const db = document.getElementById("dayButtons");
+  db.innerHTML = '<span class="label">D:</span>';
+  [1,2,3].forEach(d=>{
+    const b = document.createElement("button");
+    b.className = "btn sm"+(state.todayMode&&state.currentDay===d?" primary":"");
+    b.textContent = d;
+    b.onclick = ()=>{ state.currentDay=d; state.todayMode=true; saveState(state); renderAll(); };
+    db.appendChild(b);
+  });
+  const t = document.getElementById("todayToggle");
+  t.textContent = "Today Mode: "+(state.todayMode?"ON":"OFF");
+  t.className = "btn sm "+(state.todayMode?"primary":"");
+  t.onclick = ()=>{ state.todayMode=!state.todayMode; saveState(state); renderAll(); };
 
-        // Readiness adjustment for top work
-        pct += applyReadinessPctAdj(it, inputs);
+  document.getElementById("currentPill").textContent = `Week ${state.currentWeek} · Day ${state.currentDay}`;
 
-        // Deload mode: reduce intensity and sets
-        let sets = it.sets;
-        if(inputs.deload === "on"){
-          pct *= 0.90; // -10% intensity
-          sets = Math.max(1, Math.round(sets * 0.6)); // -40% sets
+  const feel = val("feel");
+  const fp = document.getElementById("feelPill");
+  fp.textContent = `Readiness: ${feel.toUpperCase()}`;
+  fp.className = "pill"+(feel==="good"?" good":feel==="bad"?" bad":" on");
+
+  const dl = val("deload");
+  const dp = document.getElementById("deloadPill");
+  dp.textContent = `Deload: ${dl.toUpperCase()}`;
+  dp.className = "pill"+(dl==="on"?" on":"");
+
+  document.getElementById("tmPill").textContent = `TM: ${Math.round(Number(val("tmAll"))*100)}%`;
+
+  // Bump button labels track unit
+  const bumpUnit = val("unit")==="kg" ? "1.25 kg" : "2.5 lb";
+  const bUp = document.getElementById("bumpUp");
+  const bDn = document.getElementById("bumpDown");
+  if(bUp) bUp.textContent = `+${bumpUnit}`;
+  if(bDn) bDn.textContent = `−${bumpUnit}`;
+}
+
+function renderProgram() {
+  const inp = getInputs();
+
+  // Show/hide no-1RM hint
+  const hintEl = document.getElementById("no1rmHint");
+  const hasAnyRM = inp.snatch > 0 || inp.clean > 0 || inp.jerk > 0 || inp.bs > 0 || inp.fs > 0;
+  if(hintEl) hintEl.style.display = hasAnyRM ? "none" : "block";
+
+  const rows = computeRows(inp);
+  const filtered = inp.filter
+    ? rows.filter(r=>(`week ${r.week} day ${r.day} ${r.lift} ${r.tag} ${r.sets}x${r.reps} ${r.source}`).toLowerCase().includes(inp.filter))
+    : rows;
+
+  const count = state.todayMode
+    ? filtered.filter(r=>r.week===state.currentWeek&&r.day===state.currentDay).length
+    : filtered.length;
+  document.getElementById("countPill").textContent = `${count} lifts`;
+
+  const weeks = new Map();
+  for(const r of filtered) {
+    if(!weeks.has(r.week)) weeks.set(r.week, new Map());
+    const days = weeks.get(r.week);
+    if(!days.has(r.day)) days.set(r.day, []);
+    days.get(r.day).push(r);
+  }
+  const grouped = [...weeks.entries()].map(([week,daysMap])=>({
+    week, days:[...daysMap.entries()].map(([day,items])=>({day,items})).sort((a,b)=>a.day-b.day)
+  })).sort((a,b)=>a.week-b.week);
+
+  const root = document.getElementById("program");
+  root.innerHTML = "";
+
+  for(const w of grouped) {
+    // In Today Mode, skip entire weeks that don't contain the current day
+    if(state.todayMode && w.week !== state.currentWeek) continue;
+
+    const det = document.createElement("details");
+    det.className = "week";
+    det.open = state.todayMode ? true : state.expandedWeeks.includes(w.week);
+
+    const sum = document.createElement("summary");
+    const [phase, phaseClass] = getWeekPhase(w.week);
+    // Fix: use 'W${w.week}-' (with dash) to avoid W1 matching W10+
+    const wkDone = Object.keys(state.completed).filter(k=>k.startsWith(`W${w.week}-`)).length;
+    sum.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="wk-title">Week ${w.week}</span>
+        <span class="tag ${phaseClass}">${phase}</span>
+      </div>
+      <div class="wk-right"><span class="wk-done">Done ${wkDone}/3</span></div>`;
+    sum.onclick = ()=>setTimeout(()=>{
+      const idx = state.expandedWeeks.indexOf(w.week);
+      if(det.open && idx===-1) state.expandedWeeks.push(w.week);
+      if(!det.open && idx!==-1) state.expandedWeeks.splice(idx,1);
+      saveState(state);
+    },0);
+    det.appendChild(sum);
+
+    for(const d of w.days) {
+      if(state.todayMode && !(w.week===state.currentWeek && d.day===state.currentDay)) continue;
+
+      const key = `W${w.week}-D${d.day}`;
+      const isDone = !!state.completed[key];
+      const tonnage = d.items.reduce((s,it)=>s + it.sets*it.reps*it.weight, 0);
+
+      const dayCard = document.createElement("div");
+      dayCard.className = "day-card";
+
+      // Header
+      const head = document.createElement("div");
+      head.className = "day-head";
+      head.innerHTML = `
+        <div class="day-title">Day ${d.day}</div>
+        <label class="day-done-label">
+          <input type="checkbox" ${isDone?"checked":""} />Done
+        </label>`;
+      const cb = head.querySelector("input");
+      cb.onchange = e => {
+        if(e.target.checked) state.completed[key] = {ts:Date.now()};
+        else delete state.completed[key];
+        saveState(state); renderAll();
+        if(e.target.checked && navigator.vibrate) navigator.vibrate(50);
+        // Auto-advance when day 3 is checked done
+        if(e.target.checked && d.day === 3) {
+          const nextWeek = w.week < 8 ? w.week + 1 : null;
+          setTimeout(() => {
+            if(nextWeek) {
+              if(confirm(`Week ${w.week} complete! Advance to Week ${nextWeek}, Day 1?`)) {
+                state.currentWeek = nextWeek;
+                state.currentDay  = 1;
+                if(!state.expandedWeeks.includes(nextWeek)) state.expandedWeeks.push(nextWeek);
+                saveState(state); renderAll();
+              }
+            } else {
+              // 8-week block done — offer to bump all 1RMs
+              const unit = val("unit");
+              const bumpAmt = unit === "kg" ? "1.25 kg" : "2.5 lb";
+              if(confirm(`8-week cycle complete! Hit your lifts on test day?\n\nIncrease all 1RMs by ${bumpAmt} for the next block?`)) {
+                bumpLifts(1);
+                alert(`All 1RMs increased by ${bumpAmt}. Start a new block from Week 1!`);
+              } else {
+                alert("8-week cycle complete! Use the bump button in Settings to adjust 1RMs whenever you're ready.");
+              }
+            }
+          }, 200);
+        }
+      };
+
+      // Tonnage meta
+      const meta = document.createElement("div");
+      meta.className = "day-meta";
+      if(tonnage > 0) meta.innerHTML = `<span class="tonnage-chip">~${Math.round(tonnage).toLocaleString()} ${d.items[0].unit} total volume</span>`;
+
+      // Lift list
+      const list = document.createElement("div");
+      list.className = "lift-list";
+
+      for(const it of d.items) {
+        const mk = missKey(w.week, d.day, it.lift);
+        const missCnt = state.misses[mk] || 0;
+        const MAX_MISS = 3;
+        const canMiss = missCnt < MAX_MISS;
+
+        // Apply miss weight reduction (~3% per miss, compounded)
+        const dispWeight = missCnt > 0
+          ? roundInc(it.weight * Math.pow(0.97, missCnt), inp.inc)
+          : it.weight;
+
+        const tagHtml     = it.tag ? `<span class="tag ${it.tag}">${it.tag}</span>` : "";
+        const srcHtml     = `<span class="tag src">${it.source} · ${it.pct}%</span>`;
+        const limitedHtml = it.limitedBy ? `<span class="tag limited">lim: ${it.limitedBy}</span>` : "";
+        const platesHtml  = dispWeight > 0 ? renderPlates(dispWeight, it.unit) : "";
+        const warmupsHtml = dispWeight > 0 ? renderWarmups(dispWeight, it.unit, inp.inc) : "";
+
+        const box = document.createElement("div");
+        box.className = "lift-box"+(isDone?" done-day":"")+(missCnt>0?" has-misses":"");
+        box.innerHTML = `
+          <div class="lift-top">
+            <div class="lift-name">${it.lift}</div>
+            <div class="lift-tags">${tagHtml}${srcHtml}${limitedHtml}</div>
+          </div>
+          <div class="lift-mid">${it.sets} × ${it.reps}</div>
+          <div class="lift-wt">
+            ${dispWeight > 0 ? dispWeight : "—"}<span class="unit">${it.unit}</span>
+            ${missCnt > 0 ? `<span class="orig">${it.weight}${it.unit}</span>` : ""}
+          </div>
+          ${missCnt > 0 ? `<div class="miss-info">⚠ ${missCnt} miss${missCnt>1?"es":""} — weight reduced</div>` : ""}
+          <div class="lift-actions">
+            <button class="btn miss${!canMiss?" maxed":""}" data-mk="${mk}">${missCnt>0?`Miss (${missCnt}/${MAX_MISS})`:"Miss"}</button>
+            ${missCnt > 0 ? `<button class="btn sm" style="font-size:0.68rem;padding:3px 7px;" data-clr="${mk}">Clear</button>` : ""}
+          </div>
+          ${platesHtml}
+          ${warmupsHtml}`;
+
+        const missBtn = box.querySelector(`[data-mk="${mk}"]`);
+        if(missBtn && canMiss) {
+          missBtn.onclick = () => {
+            state.misses[mk] = (state.misses[mk]||0) + 1;
+            saveState(state);
+            if(navigator.vibrate) navigator.vibrate(30);
+            renderAll();
+          };
+        }
+        const clrBtn = box.querySelector(`[data-clr="${mk}"]`);
+        if(clrBtn) {
+          clrBtn.onclick = () => { delete state.misses[mk]; saveState(state); renderAll(); };
         }
 
-        let raw = 0;
-        if(it.source === "cj_combo"){
-          const rawClean = (one.clean || 0) * pct;
-          const rawJerk  = (one.jerk  || 0) * pct;
-          raw = Math.min(rawClean, rawJerk);
-        } else {
-          const base = one[it.source] || 0;
-          raw = base * pct;
-        }
+        list.appendChild(box);
+      }
 
-        const inc = inputs.inc || (inputs.unit === "lb" ? 5 : 2.5);
-        const w = roundToIncrement(raw, inc);
-
-        const limiter = (it.source === "cj_combo")
-          ? (((one.clean*pct) <= (one.jerk*pct)) ? "clean" : "jerk")
-          : "";
-
-        out.push({
-          week: d.week,
-          day: d.day,
-          lift: it.lift,
-          sets,
-          reps: it.reps,
-          pct: Math.round(pct * 100),
-          source: it.source,
-          limiter,
-          weight: w,
-          unit: inputs.unit,
-          tag: it.tag || "",
-          note: (inputs.deload === "on" ? "DELOAD " : "") + (inputs.feel ? `FEEL:${inputs.feel}` : ""),
+      // Mentzer Heavy Duty Supplementals
+      const mentzerHtml = renderMentzerSection(inp, isDone);
+      let mentzerDiv = null;
+      if(mentzerHtml) {
+        mentzerDiv = document.createElement("div");
+        mentzerDiv.innerHTML = mentzerHtml;
+        // Wire up bump buttons
+        mentzerDiv.querySelectorAll(".mentzer-btn").forEach(btn => {
+          btn.onclick = () => bumpMentzer(btn.dataset.mentzer);
         });
       }
-    }
-    return out;
-  }
 
-  function groupByWeekDay(rows){
-    const weeks = new Map();
-    for(const r of rows){
-      if(!weeks.has(r.week)) weeks.set(r.week, new Map());
-      const days = weeks.get(r.week);
-      if(!days.has(r.day)) days.set(r.day, []);
-      days.get(r.day).push(r);
-    }
-    return Array.from(weeks.entries()).map(([week, daysMap]) => ({
-      week,
-      days: Array.from(daysMap.entries()).map(([day, items]) => ({ day, items }))
-        .sort((a,b)=>a.day-b.day)
-    })).sort((a,b)=>a.week-b.week);
-  }
-
-  function toCSV(rows){
-    const headers = ["week","day","lift","sets","reps","pct","source","limiter","tag","weight","unit","note"];
-    const lines = [headers.join(",")];
-    for(const r of rows){
-      lines.push([
-        r.week,
-        r.day,
-        JSON.stringify(r.lift),
-        r.sets,
-        r.reps,
-        r.pct,
-        r.source,
-        JSON.stringify(r.limiter || ""),
-        JSON.stringify(r.tag || ""),
-        r.weight,
-        r.unit,
-        JSON.stringify(r.note || "")
-      ].join(","));
-    }
-    return lines.join("\n");
-  }
-
-  function download(filename, text){
-    const blob = new Blob([text], {type:"text/csv;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  // ----------------------------
-  // UI Rendering
-  // ----------------------------
-  let state = loadState();
-
-  function renderControls(){
-    // Week buttons
-    const wb = document.getElementById("weekButtons");
-    wb.innerHTML = "";
-    for(let w=1; w<=8; w++){
-      const b = document.createElement("button");
-      b.className = "btn small " + (state.currentWeek===w ? "primary" : "");
-      b.textContent = "W" + w;
-      b.onclick = () => {
-        state.currentWeek = w;
-        state.todayMode = true;
-        if(!state.expandedWeeks.includes(w)) state.expandedWeeks.push(w);
+      // Session notes
+      const notesArea = document.createElement("textarea");
+      notesArea.className = "notes-area";
+      notesArea.placeholder = "Session notes (feel, misses, PRs…)";
+      notesArea.value = state.notes[key] || "";
+      notesArea.addEventListener("input", () => {
+        state.notes[key] = notesArea.value;
         saveState(state);
-        renderAll();
-      };
-      wb.appendChild(b);
+      });
+
+      dayCard.appendChild(head);
+      if(tonnage > 0) dayCard.appendChild(meta);
+      dayCard.appendChild(list);
+      if(mentzerDiv) dayCard.appendChild(mentzerDiv);
+      dayCard.appendChild(notesArea);
+
+      det.appendChild(dayCard);
     }
-
-    // Day buttons
-    const db = document.getElementById("dayButtons");
-    db.innerHTML = "";
-    [1,2,3].forEach(d=>{
-      const b = document.createElement("button");
-      const active = state.todayMode && state.currentDay===d;
-      b.className = "btn small " + (active ? "primary" : "");
-      b.textContent = "D" + d;
-      b.onclick = () => {
-        state.currentDay = d;
-        state.todayMode = true;
-        saveState(state);
-        renderAll();
-      };
-      db.appendChild(b);
-    });
-
-    // Today toggle
-    const t = document.getElementById("todayToggle");
-    t.textContent = "Today Mode: " + (state.todayMode ? "ON" : "OFF");
-    t.className = "btn small " + (state.todayMode ? "primary" : "");
-    t.onclick = () => {
-      state.todayMode = !state.todayMode;
-      saveState(state);
-      renderAll();
-    };
-
-    document.getElementById("currentPill").textContent = `Week ${state.currentWeek} • Day ${state.currentDay}`;
-
-    const inputs = getInputs();
-    const feelPill = document.getElementById("feelPill");
-    feelPill.textContent = `Readiness: ${inputs.feel.toUpperCase()}`;
-    feelPill.className = "pill " + (inputs.feel==="good" ? "good" : inputs.feel==="bad" ? "bad" : "");
-
-    const deloadPill = document.getElementById("deloadPill");
-    deloadPill.textContent = `Deload: ${inputs.deload.toUpperCase()}`;
-    deloadPill.className = "pill " + (inputs.deload==="on" ? "on" : "");
+    root.appendChild(det);
   }
+}
 
-  function renderProgram(){
-    const inputs = getInputs();
-    const rows = computeRows(inputs);
+function renderHistory() {
+  const keys = Object.keys(state.completed).sort();
+  const el = document.getElementById("history");
+  if(!keys.length) { el.innerHTML = '<div class="history-empty">No completed sessions yet.</div>'; return; }
+  el.innerHTML = keys.map(k=>{
+    const v   = state.completed[k];
+    const ts  = v && v.ts ? new Date(v.ts).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}) : "—";
+    const note = state.notes[k] ? `<div class="history-note">${state.notes[k].substring(0,100)}${state.notes[k].length>100?"…":""}</div>` : "";
+    return `<div class="history-item">
+      <div class="history-key">${k.replace("W","Week ").replace("-D"," · Day ")}</div>
+      <div class="history-date">${ts}</div>
+      ${note}
+    </div>`;
+  }).join("");
+}
 
-    // Filter
-    const filtered = inputs.filter
-      ? rows.filter(r => (`week ${r.week} day ${r.day} ${r.lift} ${r.tag} ${r.sets}x${r.reps}`).toLowerCase().includes(inputs.filter))
-      : rows;
+function renderAll() { renderControls(); renderProgram(); renderHistory(); }
 
-    // Count pill for current day (if today mode) or total filtered
-    const count = state.todayMode
-      ? filtered.filter(r => r.week===state.currentWeek && r.day===state.currentDay).length
-      : filtered.length;
-    document.getElementById("countPill").textContent = `${count} lifts`;
+// ─────────────────────────────────────────────────────────────────
+// CSV EXPORT — includes 1RM metadata header
+// ─────────────────────────────────────────────────────────────────
+function toCSV(rows, inp) {
+  const meta = [
+    `# Oly Program Export — ${new Date().toLocaleDateString()}`,
+    `# Snatch 1RM: ${inp.snatch}${inp.unit}   Clean 1RM: ${inp.clean}${inp.unit}   Jerk 1RM: ${inp.jerk}${inp.unit}`,
+    `# Back Squat 1RM: ${inp.bs}${inp.unit}   Front Squat 1RM: ${inp.fs}${inp.unit}`,
+    `# Global TM: ${Math.round(inp.tm*100)}%   Readiness: ${inp.feel}   Deload: ${inp.deload}`,
+    `#`,
+  ];
+  const h = ["week","day","lift","sets","reps","pct","source","tag","weight","unit","limited_by","note"];
+  const lines = [...meta, h.join(",")];
+  for(const r of rows) lines.push([r.week,r.day,JSON.stringify(r.lift),r.sets,r.reps,r.pct,r.source,JSON.stringify(r.tag||""),r.weight,r.unit,r.limitedBy||"",JSON.stringify(r.note||"")].join(","));
+  return lines.join("\n");
+}
+function download(name, text) {
+  const a = Object.assign(document.createElement("a"),{href:URL.createObjectURL(new Blob([text],{type:"text/csv"})),download:name});
+  document.body.appendChild(a); a.click(); a.remove();
+}
+document.getElementById("exportCsv").onclick = ()=>{ const inp=getInputs(); download("oly_program.csv",toCSV(computeRows(inp),inp)); };
+document.getElementById("resetProgress").onclick = ()=>{
+  if(!confirm("Reset week/day tracking, completed checkmarks, misses, and notes?")) return;
+  state = {...DEFAULT_STATE}; saveState(state); renderAll();
+};
 
-    const grouped = groupByWeekDay(filtered);
-    const root = document.getElementById("program");
-    root.innerHTML = "";
+// ─────────────────────────────────────────────────────────────────
+// WIRE INPUTS (render + save on change)
+// ─────────────────────────────────────────────────────────────────
+["snatch","clean","jerk","bs","fs","pugwt","dipwt","unit","inc","filter","tmAll","feel","deload",
+ "tm_snatch","tm_clean","tm_jerk","tm_bs","tm_fs"].forEach(id=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener("input",  () => { saveInputs(); renderAll(); });
+  el.addEventListener("change", () => { saveInputs(); renderAll(); });
+});
 
-    for(const w of grouped){
-      const det = document.createElement("details");
-      det.className = "week";
-      det.open = state.expandedWeeks.includes(w.week);
+// Bump 1RM buttons
+document.getElementById("bumpUp").onclick   = () => bumpLifts(1);
+document.getElementById("bumpDown").onclick = () => bumpLifts(-1);
 
-      const sum = document.createElement("summary");
-      const left = document.createElement("div");
-      left.className = "wkLeft";
-      const title = document.createElement("div");
-      title.style.fontWeight = "900";
-      title.textContent = `Week ${w.week}`;
-      const sub = document.createElement("span");
-      sub.className = "tag";
-      sub.textContent = (w.week<=3) ? "ACCUMULATE" : (w.week===4) ? "DELOAD" : (w.week<=6) ? "STRENGTH" : (w.week===7) ? "REALIZE" : "PEAK/TEST";
-      left.appendChild(title);
-      left.appendChild(sub);
+// Per-lift TM arrow toggle
+document.getElementById("perLiftDetails").addEventListener("toggle", function() {
+  document.getElementById("perLiftArrow").textContent = this.open ? "▼" : "▶";
+});
 
-      const right = document.createElement("div");
-      right.className = "wkRight";
-      const wkKey = `W${w.week}`;
-      const wkDone = Object.keys(state.completed).filter(k=>k.startsWith(wkKey)).length;
-      const wkTotal = 3;
-      const badge = document.createElement("span");
-      badge.className = "tag";
-      badge.textContent = `Done ${wkDone}/${wkTotal}`;
-      right.appendChild(badge);
+// ─────────────────────────────────────────────────────────────────
+// AUDIBLE BEEP (Web Audio API — no file needed)
+// ─────────────────────────────────────────────────────────────────
+function playBeep(freq, duration, vol=0.25) {
+  try {
+    const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = freq;
+    osc.type = "sine";
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration + 0.05);
+  } catch(e) {}
+}
+function playDoneChime() {
+  // Three ascending tones
+  setTimeout(()=>playBeep(660, 0.18), 0);
+  setTimeout(()=>playBeep(880, 0.18), 200);
+  setTimeout(()=>playBeep(1100, 0.35), 400);
+}
 
-      sum.appendChild(left);
-      sum.appendChild(right);
+// ─────────────────────────────────────────────────────────────────
+// REST TIMER
+// ─────────────────────────────────────────────────────────────────
+let timerTotal=120, timerLeft=120, timerInterval=null, timerRunning=false;
 
-      sum.onclick = (e) => {
-        // allow toggle but keep state in sync
-        setTimeout(()=>{
-          const isOpen = det.open;
-          const idx = state.expandedWeeks.indexOf(w.week);
-          if(isOpen && idx===-1) state.expandedWeeks.push(w.week);
-          if(!isOpen && idx!==-1) state.expandedWeeks.splice(idx,1);
-          saveState(state);
-        },0);
-      };
+function fmtTime(s) { return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; }
 
-      det.appendChild(sum);
+function setTimer(s) {
+  resetTimer();
+  timerTotal = s; timerLeft = s;
+  document.getElementById("timerDisplay").textContent = fmtTime(s);
+  document.getElementById("timerDisplay").className = "timer-display";
+}
+function setCustomTimer() {
+  const v = Number(document.getElementById("customTimerSec").value);
+  if(v >= 10 && v <= 900) setTimer(v);
+}
 
-      // Days
-      for(const d of w.days){
-        // If Today Mode ON, only show current selection
-        if(state.todayMode && !(w.week===state.currentWeek && d.day===state.currentDay)) continue;
-
-        const dayCard = document.createElement("div");
-        dayCard.className = "dayCard";
-
-        const head = document.createElement("div");
-        head.className = "dayHead";
-
-        const hLeft = document.createElement("div");
-        hLeft.className = "left";
-        const hTitle = document.createElement("div");
-        hTitle.style.fontWeight = "900";
-        hTitle.textContent = `Day ${d.day}`;
-        hLeft.appendChild(hTitle);
-
-        const hRight = document.createElement("div");
-        hRight.className = "right";
-        const key = `W${w.week}-D${d.day}`;
-
-        const cbWrap = document.createElement("label");
-        cbWrap.className = "checkbox";
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.checked = !!state.completed[key];
-        cb.onchange = () => {
-          if(cb.checked) state.completed[key]=true;
-          else delete state.completed[key];
-          saveState(state);
-          renderAll();
-        };
-        const cbText = document.createElement("span");
-        cbText.textContent = "Done";
-        cbWrap.appendChild(cb);
-        cbWrap.appendChild(cbText);
-
-        hRight.appendChild(cbWrap);
-
-        head.appendChild(hLeft);
-        head.appendChild(hRight);
-
-        const list = document.createElement("div");
-        list.className = "liftList";
-
-        for(const it of d.items){
-          const box = document.createElement("div");
-          box.className = "lift";
-
-          const top = document.createElement("div");
-          top.className = "liftTop";
-
-          const nm = document.createElement("div");
-          nm.className = "liftName";
-          nm.textContent = it.lift;
-
-          const tg = document.createElement("span");
-          tg.className = "tag";
-          const src = it.source + (it.limiter ? `/${it.limiter}` : "");
-          const tag = it.tag ? ` • ${it.tag}` : "";
-          tg.textContent = `${src} • ${it.pct}%${tag}`;
-
-          top.appendChild(nm);
-          top.appendChild(tg);
-
-          const mid = document.createElement("div");
-          mid.className = "liftMid";
-          mid.textContent = `${it.sets} × ${it.reps}`;
-
-          const wt = document.createElement("div");
-          wt.className = "liftWt";
-          wt.textContent = `${it.weight} ${it.unit}`;
-
-          box.appendChild(top);
-          box.appendChild(mid);
-          box.appendChild(wt);
-          list.appendChild(box);
-        }
-
-        dayCard.appendChild(head);
-        dayCard.appendChild(list);
-        det.appendChild(dayCard);
+function toggleTimer() {
+  if(timerRunning) {
+    clearInterval(timerInterval); timerRunning = false;
+    document.getElementById("timerStartBtn").textContent = "Start";
+    document.getElementById("timerFabBtn").className = "timer-btn-main";
+  } else {
+    timerRunning = true;
+    document.getElementById("timerStartBtn").textContent = "Pause";
+    document.getElementById("timerFabBtn").className = "timer-btn-main running";
+    timerInterval = setInterval(()=>{
+      timerLeft--;
+      document.getElementById("timerDisplay").textContent = fmtTime(timerLeft);
+      if(timerLeft <= 0) {
+        clearInterval(timerInterval); timerRunning = false;
+        document.getElementById("timerDisplay").textContent = "Done!";
+        document.getElementById("timerDisplay").className = "timer-display done";
+        document.getElementById("timerStartBtn").textContent = "Start";
+        document.getElementById("timerFabBtn").className = "timer-btn-main";
+        if(navigator.vibrate) navigator.vibrate([200,100,200]);
+        playDoneChime();
       }
-
-      root.appendChild(det);
-    }
+    }, 1000);
   }
+}
 
-  function renderAll(){
-    renderControls();
-    renderProgram();
-  }
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false; timerLeft = timerTotal;
+  document.getElementById("timerDisplay").textContent = fmtTime(timerLeft);
+  document.getElementById("timerDisplay").className = "timer-display";
+  document.getElementById("timerStartBtn").textContent = "Start";
+  document.getElementById("timerFabBtn").className = "timer-btn-main";
+}
 
-  // ----------------------------
-  // Wire inputs
-  // ----------------------------
-  function wire(id){
-    const el = document.getElementById(id);
-    el.addEventListener("input", () => renderAll());
-    el.addEventListener("change", () => renderAll());
-  }
+function toggleTimerPopup() { document.getElementById("timerPopup").classList.toggle("open"); }
 
-  ["snatch","clean","jerk","bs","fs","unit","inc","filter","tmAll","feel","deload"].forEach(wire);
+document.addEventListener("click", e=>{
+  const fab = document.getElementById("timer-fab");
+  if(!fab.contains(e.target)) document.getElementById("timerPopup").classList.remove("open");
+});
 
-  document.getElementById("exportCsv").onclick = () => {
-    const inputs = getInputs();
-    const rows = computeRows(inputs);
-    download("oly_program.csv", toCSV(rows));
-  };
-
-  document.getElementById("resetProgress").onclick = () => {
-    if(!confirm("Reset week/day tracking and completed checkmarks?")) return;
-    state = {...defaultState};
-    saveState(state);
-    renderAll();
-  };
-
-  // init
-  renderAll();
+// ─────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────
+loadInputs();
+renderAll();
 </script>
 </body>
 </html>
